@@ -195,46 +195,49 @@
                 // Выводим имя и должность в шапку графика
                 document.getElementById('userScheduleBadge').innerText = `${currentUser.name} (${userPosition})`;
                 renderCalendar(); 
-            }).catch(err => console.log(err));
+           for (let day = 1; day <= totalDays; day++) {
+    const daySchedule = userSchedule.find(s => s.day === day);
+    let bgClass = "bg-gray-50 text-gray-700 border-gray-100";
+    let badgeText = "";
+
+    if (daySchedule) {
+        // Приводим к строке, убираем пробелы и заменяем запятые на точки на всякий случай
+        const rawShift = daySchedule.shift.toString().trim().replace(',', '.');
+        
+        // Разбиваем строку по дефису (например, "8-1.3" -> ["8", "1.3"])
+        const parts = rawShift.split('-');
+        const startTime = parts[0] ? parts[0].trim() : "";
+        const loadType = parts[1] ? parts[1].trim() : "";
+
+        // 1. ОПРЕДЕЛЯЕМ ЦВЕТ КВАДРАТА ПО ВРЕМЕНИ НАЧАЛА
+        if (startTime === "8" || startTime === "08") {
+            bgClass = "bg-emerald-500 text-white font-bold border-transparent"; // Зеленый (8 утра)
+        } else if (startTime === "11") {
+            bgClass = "bg-orange-500 text-white font-bold border-transparent"; // Оранжевый (11 утра)
+        } else {
+            bgClass = "bg-slate-400 text-white font-bold border-transparent"; // Серый для других отметок (например, ОТПУСК)
         }
 
-        function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-            document.getElementById('calendarMonthTitle').innerText = `${monthNames[month]} ${year}`;
-
-            const firstDayIndex = new Date(year, month, 1).getDay();
-            const shiftClick = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
-            const totalDays = new Date(year, month + 1, 0).getDate();
-
-            let cells = "";
-            for (let i = 0; i < shiftClick; i++) { cells += `<div></div>`; }
-
-            for (let day = 1; day <= totalDays; day++) {
-                const daySchedule = userSchedule.find(s => s.day === day);
-                let bgClass = "bg-gray-50 text-gray-700 border-gray-100";
-                let badgeText = "";
-
-                if (daySchedule) {
-                    const parts = daySchedule.shift.split('-');
-                    const time = parts[0];
-                    badgeText = parts[1];
-                    bgClass = time === "8" ? "bg-emerald-500 text-white font-bold border-transparent" : "bg-orange-500 text-white font-bold border-transparent";
-                }
-
-                cells += `
-                    <div class="aspect-square rounded-xl border flex flex-col items-center justify-center relative ${bgClass} text-xs transition-all">
-                        <span>${day}</span>
-                        ${badgeText ? `<span class="text-[9px] opacity-90 absolute bottom-0.5">${badgeText}</span>` : ''}
-                    </div>
-                `;
-            }
-            grid.innerHTML = cells;
+        // 2. ОПРЕДЕЛЯЕМ ТЕКСТ/ИКОНКУ СНИЗУ ПО НАГРУЗКЕ
+        if (loadType === "0.5" || loadType === "0,5") {
+            badgeText = "0.5 см.";
+        } else if (loadType === "1") {
+            badgeText = "1 см.";
+        } else if (loadType === "1.3" || loadType === "1,3") {
+            badgeText = "💀 ЗАКР"; // Тот самый легендарный черепок для марафона до закрытия
+        } else {
+            // Если в таблице написано просто "8" или "11" без дефиса, или что-то другое
+            badgeText = loadType || startTime; 
         }
+    }
 
+    cells += `
+        <div class="aspect-square rounded-xl border flex flex-col items-center justify-center relative ${bgClass} text-xs transition-all">
+            <span>${day}</span>
+            ${badgeText ? `<span class="text-[8px] opacity-90 absolute bottom-0.5 whitespace-nowrap leading-none font-medium">${badgeText}</span>` : ''}
+        </div>
+    `;
+}
         // Логика инвентаря и ТК прежняя...
         function renderInvCategories() { const container = document.getElementById('invCategories'); const cats = ['Все', ...new Set(INVENTORY_DATA.map(p => p.category))]; container.innerHTML = cats.map(c => `<button onclick="setInvCat('${c}')" class="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${currentInvCat === c ? 'bg-amber-400 text-slate-950' : 'bg-gray-100 text-gray-600'}">${c}</button>`).join(''); }
         function setInvCat(c) { currentInvCat = c; renderInvCategories(); filterInventory(); }
