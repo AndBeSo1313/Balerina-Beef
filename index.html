@@ -132,7 +132,7 @@
     </div>
 
     <script>
-        // ВСТАВЬ СВОЮ ССЫЛКУ ИЗ GOOGLE APPS SCRIPT
+        // АКТУАЛЬНЫЙ ССЫЛКА ИЗ GOOGLE APPS SCRIPT
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec";
 
         const INVENTORY_DATA = [
@@ -162,11 +162,35 @@
             const loginInput = document.getElementById('authLogin').value.trim();
             const passInput = document.getElementById('authPassword').value.trim();
             if (!loginInput || !passInput) { alert("Заполните логин и пароль!"); return; }
-            const btn = event.target; btn.innerText = "Проверка..."; btn.disabled = true;
-            fetch(WEB_APP_URL, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ action: "login", login: loginInput, password: passInput }) })
-            .then(res => res.json()).then(data => {
-                if (data.status === "success") { currentUser = data.user; localStorage.setItem('kitchen_logged_user', JSON.stringify(currentUser)); showMainApp(); } else { alert("Неверный логин или пароль!"); }
-            }).catch(err => { alert("Ошибка сети."); }).finally(() => { btn.innerText = "Войти в систему"; btn.disabled = false; });
+            
+            const btn = event.target; 
+            btn.innerText = "Проверка..."; btn.disabled = true;
+
+            fetch(WEB_APP_URL, { 
+                method: "POST", 
+                headers: { "Content-Type": "text/plain" }, 
+                body: JSON.stringify({ action: "login", login: loginInput, password: passInput }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") { 
+                    currentUser = data.user; 
+                    localStorage.setItem('kitchen_logged_user', JSON.stringify(currentUser)); 
+                    showMainApp(); 
+                } else if (data.status === "wrong_auth") {
+                    alert("Неверный логин или пароль!"); 
+                } else {
+                    alert("Ошибка сервера: " + (data.message || "Неизвестная ошибка"));
+                }
+            })
+            .catch(err => { 
+                alert("Ошибка сети или скрипта."); 
+                console.error(err); 
+            })
+            .finally(() => { 
+                btn.innerText = "Войти в систему"; 
+                btn.disabled = false; 
+            });
         }
 
         function showMainApp() {
@@ -178,6 +202,7 @@
         }
 
         function handleLogout() { localStorage.removeItem('kitchen_logged_user'); location.reload(); }
+        
         function switchScreen(screen) {
             document.getElementById('screen-inventory').classList.toggle('hidden', screen !== 'inventory');
             document.getElementById('screen-recipes').classList.toggle('hidden', screen !== 'recipes');
@@ -192,59 +217,109 @@
             .then(res => res.json()).then(data => { 
                 userSchedule = data.schedule || []; 
                 userPosition = data.position || "Повар";
-                // Выводим имя и должность в шапку графика
                 document.getElementById('userScheduleBadge').innerText = `${currentUser.name} (${userPosition})`;
                 renderCalendar(); 
-           for (let day = 1; day <= totalDays; day++) {
-    const daySchedule = userSchedule.find(s => s.day === day);
-    let bgClass = "bg-gray-50 text-gray-700 border-gray-100";
-    let badgeText = "";
-
-    if (daySchedule) {
-        // Приводим к строке, убираем пробелы и заменяем запятые на точки на всякий случай
-        const rawShift = daySchedule.shift.toString().trim().replace(',', '.');
-        
-        // Разбиваем строку по дефису (например, "8-1.3" -> ["8", "1.3"])
-        const parts = rawShift.split('-');
-        const startTime = parts[0] ? parts[0].trim() : "";
-        const loadType = parts[1] ? parts[1].trim() : "";
-
-        // 1. ОПРЕДЕЛЯЕМ ЦВЕТ КВАДРАТА ПО ВРЕМЕНИ НАЧАЛА
-        if (startTime === "8" || startTime === "08") {
-            bgClass = "bg-emerald-500 text-white font-bold border-transparent"; // Зеленый (8 утра)
-        } else if (startTime === "11") {
-            bgClass = "bg-orange-500 text-white font-bold border-transparent"; // Оранжевый (11 утра)
-        } else {
-            bgClass = "bg-slate-400 text-white font-bold border-transparent"; // Серый для других отметок (например, ОТПУСК)
+            }).catch(err => console.log(err));
         }
 
-        // 2. ОПРЕДЕЛЯЕМ ТЕКСТ/ИКОНКУ СНИЗУ ПО НАГРУЗКЕ
-        if (loadType === "0.5" || loadType === "0,5") {
-            badgeText = "0.5 см.";
-        } else if (loadType === "1") {
-            badgeText = "1 см.";
-        } else if (loadType === "1.3" || loadType === "1,3") {
-            badgeText = "💀 ЗАКР"; // Тот самый легендарный черепок для марафона до закрытия
-        } else {
-            // Если в таблице написано просто "8" или "11" без дефиса, или что-то другое
-            badgeText = loadType || startTime; 
-        }
-    }
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            document.getElementById('calendarMonthTitle').innerText = `${monthNames[month]} ${year}`;
 
-    cells += `
-        <div class="aspect-square rounded-xl border flex flex-col items-center justify-center relative ${bgClass} text-xs transition-all">
-            <span>${day}</span>
-            ${badgeText ? `<span class="text-[8px] opacity-90 absolute bottom-0.5 whitespace-nowrap leading-none font-medium">${badgeText}</span>` : ''}
-        </div>
-    `;
-}
-        // Логика инвентаря и ТК прежняя...
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const shiftClick = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            let cells = "";
+            for (let i = 0; i < shiftClick; i++) { cells += `<div></div>`; }
+
+            for (let day = 1; day <= totalDays; day++) {
+                const daySchedule = userSchedule.find(s => s.day === day);
+                let bgClass = "bg-gray-50 text-gray-700 border-gray-100";
+                let badgeText = "";
+
+                if (daySchedule) {
+                    const rawShift = daySchedule.shift.toString().trim().replace(',', '.');
+                    const parts = rawShift.split('-');
+                    const startTime = parts[0] ? parts[0].trim() : "";
+                    const loadType = parts[1] ? parts[1].trim() : "";
+
+                    // УМНАЯ ПОДСВЕТКА ПО ЦВЕТУ СТАРТА
+                    if (startTime === "8" || startTime === "08") {
+                        bgClass = "bg-emerald-500 text-white font-bold border-transparent";
+                    } else if (startTime === "11") {
+                        bgClass = "bg-orange-500 text-white font-bold border-transparent";
+                    } else {
+                        bgClass = "bg-slate-400 text-white font-bold border-transparent";
+                    }
+
+                    // ОТОБРАЖЕНИЕ НАГРУЗКИ (С ЧЕРЕПКОМ)
+                    if (loadType === "0.5") {
+                        badgeText = "0.5 см.";
+                    } else if (loadType === "1") {
+                        badgeText = "1 см.";
+                    } else if (loadType === "1.3") {
+                        badgeText = "💀 ЗАКР";
+                    } else {
+                        badgeText = loadType || startTime;
+                    }
+                }
+
+                cells += `
+                    <div class="aspect-square rounded-xl border flex flex-col items-center justify-center relative ${bgClass} text-xs transition-all">
+                        <span>${day}</span>
+                        ${badgeText ? `<span class="text-[8px] opacity-90 absolute bottom-0.5 whitespace-nowrap leading-none font-medium">${badgeText}</span>` : ''}
+                    </div>
+                `;
+            }
+            grid.innerHTML = cells;
+        }
+
         function renderInvCategories() { const container = document.getElementById('invCategories'); const cats = ['Все', ...new Set(INVENTORY_DATA.map(p => p.category))]; container.innerHTML = cats.map(c => `<button onclick="setInvCat('${c}')" class="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${currentInvCat === c ? 'bg-amber-400 text-slate-950' : 'bg-gray-100 text-gray-600'}">${c}</button>`).join(''); }
         function setInvCat(c) { currentInvCat = c; renderInvCategories(); filterInventory(); }
-        function renderInventory(data = INVENTORY_DATA) { const list = document.getElementById('invList'); document.getElementById('totalCount').innerText = INVENTORY_DATA.length; document.getElementById('countedFact').innerText = Object.keys(invAmounts).filter(k => invAmounts[k] !== '').length; if(data.length === 0) { list.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">Нет товаров</div>`; return; } list.innerHTML = data.map(p => { const val = invAmounts[p.id] || ''; return `<div class="bg-white p-3 rounded-xl border flex items-center justify-between ${val !== '' ? 'border-emerald-200 bg-emerald-50/20' : 'border-gray-100'}"><div class="flex-1 pr-2"><div class="font-medium text-sm text-gray-900">${p.name}</div></div><div class="relative flex items-center"><input type="text" inputmode="decimal" placeholder="0" value="${val}" oninput="changeWeight(${p.id}, this.value)" class="w-16 bg-gray-50 border border-gray-300 text-center py-1.5 rounded-lg font-bold text-sm focus:outline-none focus:border-amber-500"><span class="absolute right-2 text-xs text-gray-400 pointer-events-none">${p.unit}</span></div></div>`; }).join(''); }
+        
+        function renderInventory(data = INVENTORY_DATA) { 
+            const list = document.getElementById('invList'); 
+            document.getElementById('totalCount').innerText = INVENTORY_DATA.length; 
+            document.getElementById('countedFact').innerText = Object.keys(invAmounts).filter(k => invAmounts[k] !== '').length; 
+            if(data.length === 0) { list.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">Нет товаров</div>`; return; } 
+            list.innerHTML = data.map(p => { 
+                const val = invAmounts[p.id] || ''; 
+                return `<div class="bg-white p-3 rounded-xl border flex items-center justify-between ${val !== '' ? 'border-emerald-200 bg-emerald-50/20' : 'border-gray-100'}"><div class="flex-1 pr-2"><div class="font-medium text-sm text-gray-900">${p.name}</div></div><div class="relative flex items-center"><input type="text" inputmode="decimal" placeholder="0" value="${val}" oninput="changeWeight(${p.id}, this.value)" class="w-16 bg-gray-50 border border-gray-300 text-center py-1.5 rounded-lg font-bold text-sm focus:outline-none focus:border-amber-500"><span class="absolute right-2 text-xs text-gray-400 pointer-events-none">${p.unit}</span></div></div>`; 
+            }).join(''); 
+        }
+        
         function changeWeight(id, val) { if (/^\d*\.?\d*$/.test(val)) invAmounts[id] = val; document.getElementById('countedFact').innerText = Object.keys(invAmounts).filter(k => invAmounts[k] !== '').length; }
         function filterInventory() { const q = document.getElementById('invSearch').value.toLowerCase(); const res = INVENTORY_DATA.filter(p => p.name.toLowerCase().includes(q) && (currentInvCat === 'Все' || p.category === currentInvCat)); renderInventory(res); }
-        function sendReport(event) { const itemsToSend = INVENTORY_DATA.filter(p => invAmounts[p.id] !== undefined && invAmounts[p.id] !== '').map(p => ({ name: p.name, unit: p.unit, volume: parseFloat(invAmounts[p.id]) })); if (itemsToSend.length === 0) { alert("Вы ничего не ввели!"); return; } const btn = event.target; btn.innerText = "Отправка..."; btn.disabled = true; fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "inventory", userName: currentUser.name, items: itemsToSend }) }).then(() => { alert("Данные успешно отправлены!"); invAmounts = {}; renderInventory(); }).catch(err => { alert("Ошибка: " + err); }).finally(() => { btn.innerText = "Отправить"; btn.disabled = false; }); }
+        
+        function sendReport(event) { 
+            const itemsToSend = INVENTORY_DATA.filter(p => invAmounts[p.id] !== undefined && invAmounts[p.id] !== '').map(p => ({ name: p.name, unit: p.unit, volume: parseFloat(invAmounts[p.id]) })); 
+            if (itemsToSend.length === 0) { alert("Вы ничего не ввели!"); return; } 
+            const btn = event.target; btn.innerText = "Отправка..."; btn.disabled = true; 
+            
+            fetch(WEB_APP_URL, { 
+                method: "POST", 
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ action: "inventory", userName: currentUser.name, items: itemsToSend }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    alert("Данные успешно отправлены!"); 
+                    invAmounts = {}; 
+                    renderInventory(); 
+                } else {
+                    alert("Ошибка при сохранении: " + data.message);
+                }
+            })
+            .catch(err => { alert("Ошибка сети: " + err); })
+            .finally(() => { btn.innerText = "Отправить"; btn.disabled = false; }); 
+        }
+        
         function renderRecipes(data = RECIPES_DATA) { const list = document.getElementById('recipesList'); list.innerHTML = data.map(r => `<div onclick="openModal('${r.name}', '${r.img}')" class="bg-white p-4 rounded-xl border border-gray-100 flex items-center justify-between active:bg-gray-50 transition-all cursor-pointer shadow-sm"><div class="font-semibold text-sm text-slate-900">${r.name}</div><i class="w-5 h-5 text-gray-300" data-lucide="chevron-right"></i></div>`).join(''); lucide.createIcons(); }
         function filterRecipes() { const q = document.getElementById('recSearch').value.toLowerCase(); const res = RECIPES_DATA.filter(r => r.name.toLowerCase().includes(q)); renderRecipes(res); }
         function openModal(title, imgSrc) { document.getElementById('modalTitle').innerText = title; document.getElementById('modalImage').src = imgSrc; document.getElementById('imageModal').classList.remove('hidden'); }
