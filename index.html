@@ -17,10 +17,16 @@
         
         <div id="screen-inventory" class="flex-1 flex flex-col">
             <div class="bg-slate-900 text-white p-4 sticky top-0 z-10 shadow-md">
-                <h1 class="text-xl font-bold flex items-center gap-2">
-                    <i class="text-amber-400 w-5 h-5" data-lucide="package"></i>
-                    Инвентаризация кухни
-                </h1>
+                <div class="flex justify-between items-center">
+                    <h1 class="text-xl font-bold flex items-center gap-2">
+                        <i class="text-amber-400 w-5 h-5" data-lucide="package"></i>
+                        Инвентаризация
+                    </h1>
+                    <button onclick="askUserName()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition-colors">
+                        <i class="w-3.5 h-3.5 text-amber-400" data-lucide="user"></i>
+                        <span id="userBadge">Кто считает?</span>
+                    </button>
+                </div>
                 <div class="relative mt-3">
                     <i class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" data-lucide="search"></i>
                     <input type="text" id="invSearch" placeholder="Поиск товара или полуфабриката..." class="w-full bg-slate-800 text-white pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-500 text-base" oninput="filterInventory()">
@@ -76,16 +82,16 @@
     </div>
 
     <script>
-        // ТУТ ВСТАВЬ СВОЮ ССЫЛКУ ИЗ GOOGLE APPS SCRIPT (Шаг 3 из прошлого сообщения)
+        // ТУТ ВСТАВЬ СВОЮ ССЫЛКУ ИЗ GOOGLE APPS SCRIPT
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec";
 
-        // БАЗА ДАННЫХ ИНВЕНТАРИЗАЦИИ (кг или шт)
+        // БАЗА ДАННЫХ ИНВЕНТАРИЗАЦИИ
         const INVENTORY_DATA = [
             { id: 1, name: 'Сливки 33% Чудское озеро', category: 'Молочка/Сыры', unit: 'кг' },
             { id: 2, name: 'Сыр Пармезан тертый', category: 'Молочка/Сыры', unit: 'кг' },
             { id: 3, name: 'Томаты Черри', category: 'Овощи/Зелень', unit: 'кг' },
-            { id: 4, name: 'Яйцо куриное С1', category: 'Яйцо', unit: 'шт' }, // Вот пример штучного товара
-            { id: 5, name: 'Лепешка тортилья 22см', category: 'Хлеб', unit: 'шт' }  // Еще один штучный товар
+            { id: 4, name: 'Яйцо куриное С1', category: 'Яйцо', unit: 'шт' },
+            { id: 5, name: 'Лепешка тортилья 22см', category: 'Хлеб', unit: 'шт' }
         ];
 
         // БАЗА ДАННЫХ ТЕХКАРТ
@@ -96,12 +102,30 @@
 
         let currentInvCat = 'Все';
         let invAmounts = {};
+        let currentUserName = localStorage.getItem('kitchen_user_name') || '';
 
         function init() {
+            if (!currentUserName) {
+                setTimeout(askUserName, 500);
+            } else {
+                document.getElementById('userBadge').innerText = currentUserName;
+            }
             renderInvCategories();
             renderInventory();
             renderRecipes();
             lucide.createIcons();
+        }
+
+        function askUserName() {
+            let name = prompt("Введите ваше имя или цех (например: Иван, или Горячий цех):", currentUserName);
+            if (name && name.trim() !== "") {
+                currentUserName = name.trim();
+                localStorage.setItem('kitchen_user_name', currentUserName);
+                document.getElementById('userBadge').innerText = currentUserName;
+            } else if (!currentUserName) {
+                currentUserName = "Повар";
+                document.getElementById('userBadge').innerText = currentUserName;
+            }
         }
 
         function switchScreen(screen) {
@@ -177,7 +201,10 @@
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ items: itemsToSend })
+                body: JSON.stringify({ 
+                    userName: currentUserName,
+                    items: itemsToSend 
+                })
             })
             .then(() => {
                 alert("Данные успешно отправлены в таблицу!");
