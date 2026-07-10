@@ -274,44 +274,53 @@
             let cells = "";
             for (let i = 0; i < shiftClick; i++) { cells += `<div></div>`; }
 
-            for (let day = 1; day <= totalDays; day++) {
-                const daySchedule = userSchedule.find(s => s.day === day);
-                let bgClass = "bg-gray-50 text-gray-700 border-gray-100";
-                let badgeText = "";
+          for (let day = 1; day <= totalDays; day++) {
+    const daySchedule = userSchedule.find(s => s.day === day);
+    let bgClass = "bg-gray-50 text-gray-700 border-gray-100";
+    let badgeText = "";
 
-                if (daySchedule && daySchedule.shift) {
-                    const rawShift = daySchedule.shift.toString().trim().replace(',', '.');
-                    const parts = rawShift.split('-');
-                    const startTime = parts[0] ? parts[0].trim() : "";
-                    const loadType = parts[1] ? parts[1].trim() : "";
+    if (daySchedule && daySchedule.shift) {
+        // Очищаем строку от пробелов и приводим к единому стандарту с точкой
+        const rawShift = daySchedule.shift.toString().trim().replace(/\s+/g, '').replace(',', '.');
+        
+        // Разбиваем по дефису
+        const parts = rawShift.split('-');
+        const startTime = parts[0] ? parts[0].trim() : "";
+        let loadType = parts[1] ? parts[1].trim() : "";
 
-                    // УМНАЯ ПОДСВЕТКА ПО ЦВЕТУ СТАРТА
-                    if (startTime === "8" || startTime === "08") {
-                        bgClass = "bg-emerald-500 text-white font-bold border-transparent";
-                    } else if (startTime === "11") {
-                        bgClass = "bg-orange-500 text-white font-bold border-transparent";
-                    } else {
-                        bgClass = "bg-slate-400 text-white font-bold border-transparent";
-                    }
+        // 1. ПОДСВЕТКА ПО ЦВЕТУ СТАРТА (8 — зеленый, 11 — оранжевый)
+        if (startTime === "8" || startTime === "08") {
+            bgClass = "bg-emerald-500 text-white font-bold border-transparent";
+        } else if (startTime === "11") {
+            bgClass = "bg-orange-500 text-white font-bold border-transparent";
+        } else {
+            bgClass = "bg-slate-400 text-white font-bold border-transparent"; // Если старт не 8 и не 11
+        }
 
-                    // ОТОБРАЖЕНИЕ НАГРУЗКИ (С ЧЕРЕПКОМ)
-                    if (loadType === "0.5") {
-                        badgeText = "0.5 см.";
-                    } else if (loadType === "1") {
-                        badgeText = "1 см.";
-                    } else if (loadType === "1.3") {
-                        badgeText = "💀 ЗАКР";
-                    } else {
-                        badgeText = loadType || startTime;
-                    }
-                }
+        // 2. ОПРЕДЕЛЯЕМ НАГРУЗКУ (ЧЕРЕПОК И СМЕНЫ)
+        if (loadType === "0.5" || loadType === "0.5") {
+            badgeText = "0.5 см.";
+        } else if (loadType === "1" || loadType === "1.0") {
+            badgeText = "1 см.";
+        } else if (loadType === "1.3" || loadType === "1.3") {
+            badgeText = "💀 ЗАКР";
+        } else {
+            // Если в таблице забыли поставить дефис (например, просто написали "8" или "11")
+            if (!loadType) {
+                badgeText = "1 см."; // По умолчанию считаем целой сменой, если указано только время
+            } else {
+                badgeText = loadType; // Если написано что-то другое (например, "8-ланч")
+            }
+        }
+    }
 
-                cells += `
-                    <div class="aspect-square rounded-xl border flex flex-col items-center justify-center relative ${bgClass} text-xs transition-all">
-                        <span>${day}</span>
-                        ${badgeText ? `<span class="text-[8px] opacity-90 absolute bottom-0.5 whitespace-nowrap leading-none font-medium">${badgeText}</span>` : ''}
-                    </div>
-                `;
+    cells += `
+        <div class="aspect-square rounded-xl border flex flex-col items-center justify-center relative ${bgClass} text-xs transition-all">
+            <span>${day}</span>
+            ${badgeText ? `<span class="text-[8px] opacity-90 absolute bottom-0.5 whitespace-nowrap leading-none font-medium">${badgeText}</span>` : ''}
+        </div>
+    `;
+}
             }
             grid.innerHTML = cells;
         }
