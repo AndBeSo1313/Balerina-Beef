@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Кухня: Управление</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-24 font-sans antialiased text-gray-900 select-none">
+
+    <div class="max-w-md mx-auto bg-gray-50 min-h-screen shadow-xl relative flex flex-col">
+        
+        <div id="screen-inventory" class="flex-1 flex flex-col">
+            <div class="bg-slate-900 text-white p-4 sticky top-0 z-10 shadow-md">
+                <h1 class="text-xl font-bold flex items-center gap-2">
+                    <i class="text-amber-400 w-5 h-5" data-lucide="package"></i>
+                    Инвентаризация кухни
+                </h1>
+                <div class="relative mt-3">
+                    <i class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" data-lucide="search"></i>
+                    <input type="text" id="invSearch" placeholder="Поиск товара или полуфабриката..." class="w-full bg-slate-800 text-white pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-500 text-base" oninput="filterInventory()">
+                </div>
+            </div>
+            <div class="flex gap-2 overflow-x-auto p-3 no-scrollbar bg-white border-b border-gray-200" id="invCategories"></div>
+            <div class="p-3 space-y-2 flex-1" id="invList"></div>
+            <div class="p-4 bg-white border-t border-gray-200 flex items-center justify-between sticky bottom-16 z-10 shadow-md">
+                <div>
+                    <div class="text-xs text-gray-500 font-medium">Посчитано позиций:</div>
+                    <div class="text-base font-bold text-slate-900"><span id="countedFact">0</span> / <span id="totalCount">0</span></div>
+                </div>
+                <button onclick="alert('Успешно сохранено!')" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm active:scale-95 transition-all">Отправить отчет</button>
+            </div>
+        </div>
+
+        <div id="screen-recipes" class="flex-1 flex flex-col hidden">
+            <div class="bg-slate-900 text-white p-4 sticky top-0 z-10 shadow-md">
+                <h1 class="text-xl font-bold flex items-center gap-2">
+                    <i class="text-amber-400 w-5 h-5" data-lucide="book-open"></i>
+                    Технологические карты
+                </h1>
+                <div class="relative mt-3">
+                    <i class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" data-lucide="search"></i>
+                    <input type="text" id="recSearch" placeholder="Введи название (напр. айоли)..." class="w-full bg-slate-800 text-white pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-500 text-base" oninput="filterRecipes()">
+                </div>
+            </div>
+            <div class="p-3 space-y-2 flex-1" id="recipesList"></div>
+        </div>
+
+        <div id="imageModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col justify-between p-4 animate-fade-in">
+            <div class="flex justify-between items-center text-white">
+                <h3 id="modalTitle" class="font-bold text-base truncate pr-4">Название блюда</h3>
+                <button onclick="closeModal()" class="bg-white/10 p-2 rounded-full active:scale-95"><i class="w-6 h-6 text-white" data-lucide="x"></i></button>
+            </div>
+            <div class="flex-1 flex items-center justify-center overflow-hidden my-4">
+                <img id="modalImage" src="" alt="ТК" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+            </div>
+            <div class="text-center text-gray-400 text-xs pb-2">Разведите пальцами для увеличения масштаба</div>
+        </div>
+
+        <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-slate-900 text-white border-t border-slate-800 h-16 flex items-center justify-around z-20 shadow-2xl">
+            <button onclick="switchScreen('inventory')" id="nav-inventory" class="flex flex-col items-center gap-1 text-amber-400 transition-colors">
+                <i class="w-5 h-5" data-lucide="package"></i>
+                <span class="text-[10px] font-medium">Инвентаризация</span>
+            </button>
+            <button onclick="switchScreen('recipes')" id="nav-recipes" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <i class="w-5 h-5" data-lucide="book-open"></i>
+                <span class="text-[10px] font-medium">Техкарты</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // БАЗА ДАННЫХ ИНВЕНТАРИЗАЦИИ
+        const INVENTORY_DATA = [
+            { id: 1, name: 'Сливки 33% Чудское озеро', category: 'Молочка/Сыры', unit: 'л', zone: 'Холодильник №1' },
+            { id: 2, name: 'Сливки 10% Домик в деревне', category: 'Молочка/Сыры', unit: 'л', zone: 'Сухой склад' },
+            { id: 3, name: 'Сыр Пармезан тертый', category: 'Молочка/Сыры', unit: 'кг', zone: 'Холодный цех' },
+            { id: 7, name: 'Томаты Черри', category: 'Овощи/Зелень', unit: 'кг', zone: 'Холодный цех' }
+        ];
+
+        // БАЗА ДАННЫХ ТЕХКАРТ (Замените ссылки на реальные скриншоты!)
+        const RECIPES_DATA = [
+            { id: 1, name: 'Соус Айоли классический (п/ф)', type: 'Соусы / Полуфабрикаты', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500' },
+            { id: 2, name: 'Соус Айоли трюфельный (п/ф)', type: 'Соусы / Полуфабрикаты', img: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500' },
+            { id: 3, name: 'Соус Айоли с запеченным чесноком (п/ф)', type: 'Соусы / Полуфабрикаты', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500' },
+            { id: 4, name: 'Бургер с соусом айоли', type: 'Горячие блюда', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500' }
+        ];
+
+        let currentInvCat = 'Все';
+        let invAmounts = {};
+
+        function init() {
+            renderInvCategories();
+            renderInventory();
+            renderRecipes();
+            lucide.createIcons();
+        }
+
+        // НАВИГАЦИЯ
+        function switchScreen(screen) {
+            document.getElementById('screen-inventory').classList.toggle('hidden', screen !== 'inventory');
+            document.getElementById('screen-recipes').classList.toggle('hidden', screen !== 'recipes');
+            
+            document.getElementById('nav-inventory').className = screen === 'inventory' ? 'flex flex-col items-center gap-1 text-amber-400' : 'flex flex-col items-center gap-1 text-gray-400';
+            document.getElementById('nav-recipes').className = screen === 'recipes' ? 'flex flex-col items-center gap-1 text-amber-400' : 'flex flex-col items-center gap-1 text-gray-400';
+        }
+
+        // ЛОГИКА ИНВЕНТАРИЗАЦИИ
+        function renderInvCategories() {
+            const container = document.getElementById('invCategories');
+            const cats = ['Все', ...new Set(INVENTORY_DATA.map(p => p.category))];
+            container.innerHTML = cats.map(c => `<button onclick="setInvCat('${c}')" class="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${currentInvCat === c ? 'bg-amber-400 text-slate-950' : 'bg-gray-100 text-gray-600'}">${c}</button>`).join('');
+        }
+
+        function setInvCat(c) { currentInvCat = c; renderInvCategories(); filterInventory(); }
+
+        function renderInventory(data = INVENTORY_DATA) {
+            const list = document.getElementById('invList');
+            document.getElementById('totalCount').innerText = INVENTORY_DATA.length;
+            document.getElementById('countedFact').innerText = Object.values(invAmounts).filter(v => v !== '').length;
+
+            if(data.length === 0) { list.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">Нет товаров</div>`; return; }
+
+            list.innerHTML = data.map(p => {
+                const val = invAmounts[p.id] || '';
+                return `
+                    <div class="bg-white p-3 rounded-xl border flex items-center justify-between ${val !== '' ? 'border-emerald-200 bg-emerald-50/20' : 'border-gray-100'}">
+                        <div>
+                            <div class="font-medium text-sm text-gray-900">${p.name}</div>
+                            <div class="text-[11px] text-gray-500 mt-0.5">${p.zone}</div>
+                        </div>
+                        <div class="relative flex items-center">
+                            <input type="text" inputmode="decimal" placeholder="0" value="${val}" oninput="changeWeight(${p.id}, this.value)" class="w-16 bg-gray-50 border border-gray-300 text-center py-1.5 rounded-lg font-bold text-sm focus:outline-none focus:border-amber-500">
+                            <span class="absolute right-2 text-xs text-gray-400 pointer-events-none">${p.unit}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function changeWeight(id, val) {
+            if (/^\d*\.?\d*$/.test(val)) invAmounts[id] = val;
+            document.getElementById('countedFact').innerText = Object.values(invAmounts).filter(v => v !== '').length;
+        }
+
+        function filterInventory() {
+            const q = document.getElementById('invSearch').value.toLowerCase();
+            const res = INVENTORY_DATA.filter(p => p.name.toLowerCase().includes(q) && (currentInvCat === 'Все' || p.category === currentInvCat));
+            renderInventory(res);
+        }
+
+        // ЛОГИКА ТЕХКАРТ
+        function renderRecipes(data = RECIPES_DATA) {
+            const list = document.getElementById('recipesList');
+            if(data.length === 0) { list.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">Ничего не найдено</div>`; return; }
+
+            list.innerHTML = data.map(r => `
+                <div onclick="openModal('${r.name}', '${r.img}')" class="bg-white p-4 rounded-xl border border-gray-100 flex items-center justify-between active:bg-gray-50 active:scale-[0.99] transition-all cursor-pointer shadow-sm">
+                    <div>
+                        <div class="font-semibold text-sm text-slate-900">${r.name}</div>
+                        <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                            <i class="w-3 h-3" data-lucide="folder"></i> ${r.type}
+                        </div>
+                    </div>
+                    <i class="w-5 h-5 text-gray-300" data-lucide="chevron-right"></i>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function filterRecipes() {
+            const q = document.getElementById('recSearch').value.toLowerCase();
+            const res = RECIPES_DATA.filter(r => r.name.toLowerCase().includes(q));
+            renderRecipes(res);
+        }
+
+        // УПРАВЛЕНИЕ МОДАЛКОЙ ТК
+        function openModal(title, imgSrc) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalImage').src = imgSrc;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
