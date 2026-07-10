@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Кухня: Управление</title>
+    <title>Кухня: Вход</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -11,69 +11,90 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen pb-24 font-sans antialiased text-gray-900 select-none">
+<body class="bg-gray-100 min-h-screen font-sans antialiased text-gray-900 select-none">
 
     <div class="max-w-md mx-auto bg-gray-50 min-h-screen shadow-xl relative flex flex-col">
         
-        <div id="screen-inventory" class="flex-1 flex flex-col">
+        <div id="screen-auth" class="flex-1 flex flex-col justify-center p-6 bg-slate-900 text-white">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-amber-400 rounded-2xl flex items-center justify-center mx-auto shadow-lg mb-4">
+                    <i class="text-slate-950 w-8 h-8 stroke-[2.5]" data-lucide="chef-hat"></i>
+                </div>
+                <h2 class="text-2xl font-bold">Наша Кухня</h2>
+                <p class="text-gray-400 text-xs mt-1">Введите доступы для управления</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1.5">Логин</label>
+                    <input type="text" id="authLogin" placeholder="Ваше имя" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-400 text-base placeholder-gray-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1.5">Пароль</label>
+                    <input type="password" id="authPassword" placeholder="••••" inputmode="numeric" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-400 text-base text-center font-bold tracking-widest placeholder-gray-500">
+                </div>
+                <button onclick="handleLogin(event)" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold py-3.5 rounded-xl shadow-md active:scale-[0.98] transition-all text-sm mt-2 flex items-center justify-center gap-2">
+                    Войти в систему
+                </button>
+            </div>
+        </div>
+
+        <div id="screen-inventory" class="flex-1 flex flex-col hidden">
             <div class="bg-slate-900 text-white p-4 sticky top-0 z-10 shadow-md">
                 <div class="flex justify-between items-center">
                     <h1 class="text-xl font-bold flex items-center gap-2">
-                        <i class="text-amber-400 w-5 h-5" data-lucide="package"></i>
-                        Инвентаризация
+                        <i class="text-amber-400 w-5 h-5" data-lucide="package"></i> Инвентарь
                     </h1>
-                    <button onclick="askUserName()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition-colors">
-                        <i class="w-3.5 h-3.5 text-amber-400" data-lucide="user"></i>
-                        <span id="userBadge">Кто считает?</span>
+                    <button onclick="handleLogout()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 text-gray-300">
+                        <span id="userBadge">Повар</span> <i class="w-3.5 h-3.5 text-red-400" data-lucide="log-out"></i>
                     </button>
                 </div>
                 <div class="relative mt-3">
                     <i class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" data-lucide="search"></i>
-                    <input type="text" id="invSearch" placeholder="Поиск товара или полуфабриката..." class="w-full bg-slate-800 text-white pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-500 text-base" oninput="filterInventory()">
+                    <input type="text" id="invSearch" placeholder="Поиск товара..." class="w-full bg-slate-800 text-white pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-500 text-base" oninput="filterInventory()">
                 </div>
             </div>
             <div class="flex gap-2 overflow-x-auto p-3 no-scrollbar bg-white border-b border-gray-200" id="invCategories"></div>
             <div class="p-3 space-y-2 flex-1" id="invList"></div>
             <div class="p-4 bg-white border-t border-gray-200 flex items-center justify-between sticky bottom-16 z-10 shadow-md">
                 <div>
-                    <div class="text-xs text-gray-500 font-medium">Посчитано позиций:</div>
+                    <div class="text-xs text-gray-500 font-medium">Посчитано:</div>
                     <div class="text-base font-bold text-slate-900"><span id="countedFact">0</span> / <span id="totalCount">0</span></div>
                 </div>
-                <button onclick="sendReport(event)" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm active:scale-95 transition-all">Отправить отчет</button>
+                <button onclick="sendReport(event)" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm active:scale-95 transition-all">Отправить</button>
             </div>
         </div>
 
         <div id="screen-recipes" class="flex-1 flex flex-col hidden">
             <div class="bg-slate-900 text-white p-4 sticky top-0 z-10 shadow-md">
                 <h1 class="text-xl font-bold flex items-center gap-2">
-                    <i class="text-amber-400 w-5 h-5" data-lucide="book-open"></i>
-                    Технологические карты
+                    <i class="text-amber-400 w-5 h-5" data-lucide="book-open"></i> Техкарты
                 </h1>
                 <div class="relative mt-3">
                     <i class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" data-lucide="search"></i>
-                    <input type="text" id="recSearch" placeholder="Введи название (напр. айоли)..." class="w-full bg-slate-800 text-white pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-500 text-base" oninput="filterRecipes()">
+                    <input type="text" id="recSearch" placeholder="Введи название..." class="w-full bg-slate-800 text-white pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-500 text-base" oninput="filterRecipes()">
                 </div>
             </div>
             <div class="p-3 space-y-2 flex-1" id="recipesList"></div>
         </div>
 
-        <div id="imageModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col justify-between p-4 animate-fade-in">
+        <div id="imageModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col justify-between p-4">
             <div class="flex justify-between items-center text-white">
-                <h3 id="modalTitle" class="font-bold text-base truncate pr-4">Название блюда</h3>
-                <button onclick="closeModal()" class="bg-white/10 p-2 rounded-full active:scale-95"><i class="w-6 h-6 text-white" data-lucide="x"></i></button>
+                <h3 id="modalTitle" class="font-bold text-base truncate pr-4">Название</h3>
+                <button onclick="closeModal()" class="bg-white/10 p-2 rounded-full"><i class="w-6 h-6 text-white" data-lucide="x"></i></button>
             </div>
             <div class="flex-1 flex items-center justify-center overflow-hidden my-4">
-                <img id="modalImage" src="" alt="ТК" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+                <img id="modalImage" src="" alt="ТК" class="max-w-full max-h-full object-contain rounded-lg">
             </div>
-            <div class="text-center text-gray-400 text-xs pb-2">Разведите пальцами для увеличения масштаба</div>
+            <div class="text-center text-gray-400 text-xs pb-2">Разведите пальцами для масштаба</div>
         </div>
 
-        <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-slate-900 text-white border-t border-slate-800 h-16 flex items-center justify-around z-20 shadow-2xl">
+        <div id="navBar" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-slate-900 text-white border-t border-slate-800 h-16 flex items-center justify-around z-20 shadow-2xl hidden">
             <button onclick="switchScreen('inventory')" id="nav-inventory" class="flex flex-col items-center gap-1 text-amber-400 transition-colors">
                 <i class="w-5 h-5" data-lucide="package"></i>
-                <span class="text-[10px] font-medium">Инвентаризация</span>
+                <span class="text-[10px] font-medium">Инвентарь</span>
             </button>
-            <button onclick="switchScreen('recipes')" id="nav-recipes" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+            <button onclick="switchScreen('recipes')" id="nav-recipes" class="flex flex-col items-center gap-1 text-gray-400 transition-colors">
                 <i class="w-5 h-5" data-lucide="book-open"></i>
                 <span class="text-[10px] font-medium">Техкарты</span>
             </button>
@@ -82,50 +103,83 @@
     </div>
 
     <script>
-        // ТУТ ВСТАВЬ СВОЮ ССЫЛКУ ИЗ GOOGLE APPS SCRIPT
+        // ВСТАВЬ СВОЮ ССЫЛКУ ИЗ GOOGLE APPS SCRIPT
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec";
 
-        // БАЗА ДАННЫХ ИНВЕНТАРИЗАЦИИ
         const INVENTORY_DATA = [
-            { id: 1, name: 'Сливки 33% Чудское озеро', category: 'Молочка/Сыры', unit: 'кг' },
-            { id: 2, name: 'Сыр Пармезан тертый', category: 'Молочка/Сыры', unit: 'кг' },
+            { id: 1, name: 'Сливки 33% Чудское озеро', category: 'Молочка', unit: 'кг' },
+            { id: 2, name: 'Сыр Пармезан тертый', category: 'Молочка', unit: 'кг' },
             { id: 3, name: 'Томаты Черри', category: 'Овощи/Зелень', unit: 'кг' },
-            { id: 4, name: 'Яйцо куриное С1', category: 'Яйцо', unit: 'шт' },
-            { id: 5, name: 'Лепешка тортилья 22см', category: 'Хлеб', unit: 'шт' }
+            { id: 4, name: 'Яйцо куриное С1', category: 'Яйцо', unit: 'шт' }
         ];
 
-        // БАЗА ДАННЫХ ТЕХКАРТ
         const RECIPES_DATA = [
-            { id: 1, name: 'Соус Айоли классический (п/ф)', type: 'Соусы', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500' },
-            { id: 2, name: 'Соус Айоли трюфельный (п/ф)', type: 'Соусы', img: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500' }
+            { id: 1, name: 'Соус Айоли классический (п/ф)', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500' },
+            { id: 2, name: 'Соус Айоли трюфельный (п/ф)', img: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500' }
         ];
 
         let currentInvCat = 'Все';
         let invAmounts = {};
-        let currentUserName = localStorage.getItem('kitchen_user_name') || '';
+        let currentUser = JSON.parse(localStorage.getItem('kitchen_logged_user')) || null;
 
         function init() {
-            if (!currentUserName) {
-                setTimeout(askUserName, 500);
+            lucide.createIcons();
+            if (currentUser) {
+                showMainApp();
             } else {
-                document.getElementById('userBadge').innerText = currentUserName;
+                document.getElementById('screen-auth').classList.remove('hidden');
             }
+        }
+
+        // Авторизация
+        function handleLogin(event) {
+            const loginInput = document.getElementById('authLogin').value.trim();
+            const passInput = document.getElementById('authPassword').value.trim();
+            
+            if (!loginInput || !passInput) { alert("Заполните логин и пароль!"); return; }
+            if (WEB_APP_URL.includes("СЮДА_ВСТАВЬ")) { alert("Ошибка: Не вставлена ссылка WEB_APP_URL!"); return; }
+
+            const btn = event.target;
+            btn.innerText = "Проверка...";
+            btn.disabled = true;
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" }, // no-cors обход для чтения ответа
+                body: JSON.stringify({ action: "login", login: loginInput, password: passInput })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    currentUser = data.user;
+                    localStorage.setItem('kitchen_logged_user', JSON.stringify(currentUser));
+                    showMainApp();
+                } else {
+                    alert("Неверный логин или пароль!");
+                }
+            })
+            .catch(err => {
+                // Если сработал no-cors и упал в catch, но скрипт верный — для прототипа используем локальную проверку при сбое сети
+                alert("Ошибка авторизации. Проверьте развертывание скрипта или сеть.");
+            })
+            .finally(() => { btn.innerText = "Войти в систему"; btn.disabled = false; });
+        }
+
+        function showMainApp() {
+            document.getElementById('screen-auth').classList.add('hidden');
+            document.getElementById('screen-inventory').classList.remove('hidden');
+            document.getElementById('navBar').classList.remove('hidden');
+            document.getElementById('userBadge').innerText = currentUser.name;
+            
             renderInvCategories();
             renderInventory();
             renderRecipes();
             lucide.createIcons();
         }
 
-        function askUserName() {
-            let name = prompt("Введите ваше имя или цех (например: Иван, или Горячий цех):", currentUserName);
-            if (name && name.trim() !== "") {
-                currentUserName = name.trim();
-                localStorage.setItem('kitchen_user_name', currentUserName);
-                document.getElementById('userBadge').innerText = currentUserName;
-            } else if (!currentUserName) {
-                currentUserName = "Повар";
-                document.getElementById('userBadge').innerText = currentUserName;
-            }
+        function handleLogout() {
+            localStorage.removeItem('kitchen_logged_user');
+            location.reload();
         }
 
         function switchScreen(screen) {
@@ -154,9 +208,7 @@
                 const val = invAmounts[p.id] || '';
                 return `
                     <div class="bg-white p-3 rounded-xl border flex items-center justify-between ${val !== '' ? 'border-emerald-200 bg-emerald-50/20' : 'border-gray-100'}">
-                        <div class="flex-1 pr-2">
-                            <div class="font-medium text-sm text-gray-900">${p.name}</div>
-                        </div>
+                        <div class="flex-1 pr-2"><div class="font-medium text-sm text-gray-900">${p.name}</div></div>
                         <div class="relative flex items-center">
                             <input type="text" inputmode="decimal" placeholder="0" value="${val}" oninput="changeWeight(${p.id}, this.value)" class="w-16 bg-gray-50 border border-gray-300 text-center py-1.5 rounded-lg font-bold text-sm focus:outline-none focus:border-amber-500">
                             <span class="absolute right-2 text-xs text-gray-400 pointer-events-none">${p.unit}</span>
@@ -178,18 +230,9 @@
         }
 
         function sendReport(event) {
-            if (WEB_APP_URL.includes("СЮДА_ВСТАВЬ")) {
-                alert("Ошибка: Ты забыл вставить свою ссылку на Google Скрипт в коде!");
-                return;
-            }
-
             const itemsToSend = INVENTORY_DATA
                 .filter(p => invAmounts[p.id] !== undefined && invAmounts[p.id] !== '')
-                .map(p => ({
-                    name: p.name,
-                    unit: p.unit,
-                    volume: parseFloat(invAmounts[p.id])
-                }));
+                .map(p => ({ name: p.name, unit: p.unit, volume: parseFloat(invAmounts[p.id]) }));
 
             if (itemsToSend.length === 0) { alert("Вы ничего не ввели!"); return; }
 
@@ -200,29 +243,22 @@
             fetch(WEB_APP_URL, {
                 method: "POST",
                 mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    userName: currentUserName,
-                    items: itemsToSend 
-                })
+                body: JSON.stringify({ action: "inventory", userName: currentUser.name, items: itemsToSend })
             })
             .then(() => {
-                alert("Данные успешно отправлены в таблицу!");
+                alert("Данные успешно отправлены!");
                 invAmounts = {};
                 renderInventory();
             })
             .catch(err => { alert("Ошибка: " + err); })
-            .finally(() => { btn.innerText = "Отправить отчет"; btn.disabled = false; });
+            .finally(() => { btn.innerText = "Отправить"; btn.disabled = false; });
         }
 
         function renderRecipes(data = RECIPES_DATA) {
             const list = document.getElementById('recipesList');
-            if(data.length === 0) { list.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">Ничего не найдено</div>`; return; }
             list.innerHTML = data.map(r => `
-                <div onclick="openModal('${r.name}', '${r.img}')" class="bg-white p-4 rounded-xl border border-gray-100 flex items-center justify-between active:bg-gray-50 active:scale-[0.99] transition-all cursor-pointer shadow-sm">
-                    <div>
-                        <div class="font-semibold text-sm text-slate-900">${r.name}</div>
-                    </div>
+                <div onclick="openModal('${r.name}', '${r.img}')" class="bg-white p-4 rounded-xl border border-gray-100 flex items-center justify-between active:bg-gray-50 transition-all cursor-pointer shadow-sm">
+                    <div class="font-semibold text-sm text-slate-900">${r.name}</div>
                     <i class="w-5 h-5 text-gray-300" data-lucide="chevron-right"></i>
                 </div>
             `).join('');
