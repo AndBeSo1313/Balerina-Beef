@@ -132,7 +132,6 @@
     </div>
 
     <script>
-        // АКТУАЛЬНАЯ ССЫЛКА ИЗ GOOGLE APPS SCRIPT
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec";
 
         const INVENTORY_DATA = [
@@ -153,7 +152,6 @@
         let userSchedule = [];
         let userPosition = "Повар";
 
-        // Безопасное чтение localStorage при старте
         try {
             const savedUser = localStorage.getItem('kitchen_logged_user');
             if (savedUser) currentUser = JSON.parse(savedUser);
@@ -169,14 +167,12 @@
         }
 
         function handleLogin(event) {
-            // Предотвращаем дефолтное поведение, если кнопка внутри формы
             if(event) event.preventDefault();
             
             const loginInput = document.getElementById('authLogin').value.trim();
             const passInput = document.getElementById('authPassword').value.trim();
             if (!loginInput || !passInput) { alert("Заполните логин и пароль!"); return; }
             
-            // Защищенный поиск кнопки входа
             const btn = event && event.target ? event.target : document.querySelector('#screen-auth button'); 
             if(btn) { btn.innerText = "Проверка..."; btn.disabled = true; }
 
@@ -198,7 +194,7 @@
                 }
             })
             .catch(err => { 
-                alert("Ошибка сети или скрипта. Проверьте подключение."); 
+                alert("Ошибка сети или скрипта."); 
                 console.error(err); 
             })
             .finally(() => { 
@@ -211,7 +207,6 @@
             document.getElementById('screen-inventory').classList.remove('hidden');
             document.getElementById('navBar').classList.remove('hidden');
             
-            // Обновляем имя пользователя на экранах
             document.querySelectorAll('.userBadgeName').forEach(el => {
                 if(currentUser && currentUser.name) el.innerText = currentUser.name;
             });
@@ -274,53 +269,48 @@
             let cells = "";
             for (let i = 0; i < shiftClick; i++) { cells += `<div></div>`; }
 
-          for (let day = 1; day <= totalDays; day++) {
-    const daySchedule = userSchedule.find(s => s.day === day);
-    let bgClass = "bg-gray-50 text-gray-700 border-gray-100";
-    let badgeText = "";
+            for (let day = 1; day <= totalDays; day++) {
+                const daySchedule = userSchedule.find(s => s.day === day);
+                let bgClass = "bg-gray-50 text-gray-700 border-gray-100";
+                let badgeText = "";
 
-    if (daySchedule && daySchedule.shift) {
-        // Очищаем строку от пробелов и приводим к единому стандарту с точкой
-        const rawShift = daySchedule.shift.toString().trim().replace(/\s+/g, '').replace(',', '.');
-        
-        // Разбиваем по дефису
-        const parts = rawShift.split('-');
-        const startTime = parts[0] ? parts[0].trim() : "";
-        let loadType = parts[1] ? parts[1].trim() : "";
+                if (daySchedule && daySchedule.shift) {
+                    // Самая безопасная очистка текста без сложных регулярных выражений
+                    let rawShift = daySchedule.shift.toString().trim().replace(',', '.');
+                    rawShift = rawShift.split(' ').join(''); // удаляем пробелы
+                    
+                    const parts = rawShift.split('-');
+                    const startTime = parts[0] ? parts[0].trim() : "";
+                    const loadType = parts[1] ? parts[1].trim() : "";
 
-        // 1. ПОДСВЕТКА ПО ЦВЕТУ СТАРТА (8 — зеленый, 11 — оранжевый)
-        if (startTime === "8" || startTime === "08") {
-            bgClass = "bg-emerald-500 text-white font-bold border-transparent";
-        } else if (startTime === "11") {
-            bgClass = "bg-orange-500 text-white font-bold border-transparent";
-        } else {
-            bgClass = "bg-slate-400 text-white font-bold border-transparent"; // Если старт не 8 и не 11
-        }
+                    // ЦВЕТ КВАДРАТА
+                    if (startTime === "8" || startTime === "08") {
+                        bgClass = "bg-emerald-500 text-white font-bold border-transparent";
+                    } else if (startTime === "11") {
+                        bgClass = "bg-orange-500 text-white font-bold border-transparent";
+                    } else {
+                        bgClass = "bg-slate-400 text-white font-bold border-transparent";
+                    }
 
-        // 2. ОПРЕДЕЛЯЕМ НАГРУЗКУ (ЧЕРЕПОК И СМЕНЫ)
-        if (loadType === "0.5" || loadType === "0.5") {
-            badgeText = "0.5 см.";
-        } else if (loadType === "1" || loadType === "1.0") {
-            badgeText = "1 см.";
-        } else if (loadType === "1.3" || loadType === "1.3") {
-            badgeText = "💀 ЗАКР";
-        } else {
-            // Если в таблице забыли поставить дефис (например, просто написали "8" или "11")
-            if (!loadType) {
-                badgeText = "1 см."; // По умолчанию считаем целой сменой, если указано только время
-            } else {
-                badgeText = loadType; // Если написано что-то другое (например, "8-ланч")
-            }
-        }
-    }
+                    // ТЕКСТ НАГРУЗКИ / ЧЕРЕПОК
+                    if (loadType === "0.5") {
+                        badgeText = "0.5 см.";
+                    } else if (loadType === "1" || loadType === "1.0") {
+                        badgeText = "1 см.";
+                    } else if (loadType === "1.3") {
+                        badgeText = "💀 ЗАКР";
+                    } else {
+                        // Если в ячейке просто "8" или "11" без дефиса нагрузку ставим по умолчанию
+                        badgeText = loadType ? loadType : "1 см.";
+                    }
+                }
 
-    cells += `
-        <div class="aspect-square rounded-xl border flex flex-col items-center justify-center relative ${bgClass} text-xs transition-all">
-            <span>${day}</span>
-            ${badgeText ? `<span class="text-[8px] opacity-90 absolute bottom-0.5 whitespace-nowrap leading-none font-medium">${badgeText}</span>` : ''}
-        </div>
-    `;
-}
+                cells += `
+                    <div class="aspect-square rounded-xl border flex flex-col items-center justify-center relative ${bgClass} text-xs transition-all">
+                        <span>${day}</span>
+                        ${badgeText ? `<span class="text-[8px] opacity-90 absolute bottom-0.5 whitespace-nowrap leading-none font-medium">${badgeText}</span>` : ''}
+                    </div>
+                `;
             }
             grid.innerHTML = cells;
         }
