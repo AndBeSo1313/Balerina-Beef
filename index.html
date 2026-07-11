@@ -20,8 +20,8 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 <p class="text-sm text-neutral-500">Введите данные вашей учетной записи</p>
 </div>
 <div class="space-y-4">
-<input type="text" id="loginInput" placeholder="Имя Фамилия" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-neutral-600 transition">
-<input type="password" id="passInput" placeholder="Пароль" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-neutral-600 transition">
+<input type="text" id="loginInput" placeholder="Имя Фамилия" class="w-full bg-neutral-900 border border-neutral-800/80 rounded-xl px-4 py-3 text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-neutral-600 transition">
+<input type="password" id="passInput" placeholder="Пароль" class="w-full bg-neutral-900 border border-neutral-800/80 rounded-xl px-4 py-3 text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-neutral-600 transition">
 <button onclick="handleLogin()" class="w-full bg-white text-black font-semibold py-3 rounded-xl hover:bg-neutral-200 active:scale-[0.98] transition">Войти</button>
 </div>
 <p id="authError" class="text-sm text-red-500 text-center hidden">Неверное имя или пароль</p>
@@ -29,9 +29,14 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 
 <header class="px-4 pt-4 pb-2 border-b border-neutral-900 flex justify-between items-center bg-black/80 backdrop-blur sticky top-0 z-30">
+<div class="flex items-center gap-3">
 <div>
 <h2 id="userNameText" class="font-bold text-neutral-200">Загрузка...</h2>
 <p id="userRoleText" class="text-xs text-neutral-500">Повар</p>
+</div>
+<button onclick="handleLogout()" class="text-[10px] text-neutral-500 uppercase tracking-wider bg-neutral-900 border border-neutral-800/60 px-2 py-1 rounded-lg hover:text-red-400 active:scale-95 transition">
+Выйти
+</button>
 </div>
 <div class="text-right">
 <p id="userRateText" class="text-xs text-neutral-400 font-mono">Ставка: -- ₽</p>
@@ -48,30 +53,26 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 
 <div class="space-y-3">
 <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-500">Мой график смен</h3>
-<div id="calendarGrid" class="grid grid-cols-7 gap-2 bg-neutral-900/30 border border-neutral-900 p-3 rounded-2xl overflow-x-auto">
-</div>
+<div id="calendarGrid" class="grid grid-cols-7 gap-2 bg-neutral-900/30 border border-neutral-900 p-3 rounded-2xl overflow-x-auto"></div>
 </div>
 
 <div class="space-y-3">
 <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-500">Финансовый отчет и Штрафы</h3>
-<div id="finesList" class="space-y-2">
-</div>
+<div id="finesList" class="space-y-2"></div>
 </div>
 </div>
 
 <div id="section-ttk" class="space-y-4 hidden">
-<div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="categoriesBar">
-</div>
-<input type="text" id="searchTtk" oninput="filterTtk()" placeholder="Поиск блюда или полуфабриката..." class="w-full bg-neutral-900/60 border border-neutral-800/80 rounded-xl px-4 py-2.5 text-sm text-neutral-300 placeholder-neutral-500 focus:outline-none focus:border-neutral-700">
-<div id="ttkList" class="grid grid-cols-2 gap-3">
-</div>
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="categoriesBar"></div>
+<input type="text" id="searchTtk" oninput="filterTtk()" placeholder="Поиск блюда..." class="w-full bg-neutral-900/60 border border-neutral-800/80 rounded-xl px-4 py-2.5 text-sm text-neutral-300 placeholder-neutral-500 focus:outline-none focus:border-neutral-700">
+<div id="ttkList" class="grid grid-cols-2 gap-3"></div>
 </div>
 
 <div id="section-actions" class="space-y-4 hidden">
 <button onclick="openActionModal('inventory')" class="w-full bg-neutral-900 border border-neutral-800/80 rounded-2xl p-4 flex items-center justify-between active:scale-[0.99] transition">
 <div class="text-left">
 <h4 class="font-semibold text-neutral-200">Инвентаризация</h4>
-<p class="text-xs text-neutral-500 mt-0.5">Ввод фактических остатков</p>
+<p class="text-xs text-neutral-500 mt-0.5">Ввод фактических остатков сырья на станциях</p>
 </div>
 <span class="text-neutral-600">→</span>
 </button>
@@ -79,7 +80,7 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 <button onclick="openActionModal('writeoff')" class="w-full bg-neutral-900 border border-neutral-800/80 rounded-2xl p-4 flex items-center justify-between active:scale-[0.99] transition">
 <div class="text-left">
 <h4 class="font-semibold text-red-400">Списание: Брак / Порча</h4>
-<p class="text-xs text-neutral-500 mt-0.5">Фиксация испорченных товаров/полуфабрикатов</p>
+<p class="text-xs text-neutral-500 mt-0.5">Фиксация испорченного или сгоревшего сырья</p>
 </div>
 <span class="text-neutral-600">→</span>
 </button>
@@ -96,16 +97,13 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 
 <nav class="fixed bottom-0 left-0 right-0 h-16 bg-neutral-950/90 backdrop-blur border-t border-neutral-900 flex justify-around items-center z-40 px-2">
 <button onclick="switchTab('home')" id="btn-home" class="flex flex-col items-center space-y-1 text-white">
-<span class="text-xl">🏠</span>
-<span class="text-[10px] font-medium">Главная</span>
+<span class="text-xl">🏠</span><span class="text-[10px] font-medium">Главная</span>
 </button>
 <button onclick="switchTab('ttk')" id="btn-ttk" class="flex flex-col items-center space-y-1 text-neutral-500">
-<span class="text-xl">📖</span>
-<span class="text-[10px] font-medium">База ТТК</span>
+<span class="text-xl">📖</span><span class="text-[10px] font-medium">База ТТК</span>
 </button>
 <button onclick="switchTab('actions')" id="btn-actions" class="flex flex-col items-center space-y-1 text-neutral-500">
-<span class="text-xl">⚡</span>
-<span class="text-[10px] font-medium">Учет</span>
+<span class="text-xl">⚡</span><span class="text-[10px] font-medium">Учет</span>
 </button>
 </nav>
 
@@ -115,16 +113,14 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 <div>
 <span id="modalRecipeCategory" class="text-[10px] font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">Горячий</span>
 <h3 id="modalRecipeName" class="text-xl font-bold text-neutral-100 mt-1.5">Название ТТК</h3>
-<p id="modalRecipeOutput" class="text-xs text-neutral-500 mt-0.5">Выход: 350 гр</p>
+<p id="modalRecipeOutput" class="text-xs text-neutral-500 mt-0.5">Выход: —</p>
 </div>
 <button onclick="closeTtkModal()" class="text-neutral-500 hover:text-white text-xl p-1">✕</button>
 </div>
-
 <div class="space-y-2">
-<label class="text-xs text-neutral-400">Требуемое количество порций / кг:</label>
-<input type="number" id="ttkMultiplier" value="1" min="0" step="0.5" oninput="recalcTtk(this.value)" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-200 font-bold focus:outline-none focus:border-neutral-600">
+<label class="text-xs text-neutral-400">Количество порций:</label>
+<input type="number" id="ttkMultiplier" value="1" min="0" step="0.5" oninput="recalcTtk(this.value)" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-200 font-bold focus:outline-none">
 </div>
-
 <table class="w-full text-left text-sm mt-2">
 <thead>
 <tr class="text-[10px] uppercase text-neutral-500 border-b border-neutral-800">
@@ -133,18 +129,16 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 <th class="pb-2 text-right">Вес</th>
 </tr>
 </thead>
-<tbody id="modalTtkBody" class="divide-y divide-neutral-900">
-</tbody>
+<tbody id="modalTtkBody" class="divide-y divide-neutral-900"></tbody>
 </table>
 </div>
 </div>
 
 <div id="actionModal" class="fixed inset-0 bg-black z-50 flex flex-col hidden">
 <header class="px-4 py-4 border-b border-neutral-900 flex justify-between items-center bg-neutral-950">
-<h3 id="actionModalTitle" class="font-bold text-neutral-200">Вечерний инвентарь</h3>
+<h3 id="actionModalTitle" class="font-bold text-neutral-200">Инвентаризация</h3>
 <button onclick="closeActionModal()" class="text-neutral-400 p-1 text-sm">Отмена</button>
 </header>
-
 <div class="p-4 bg-neutral-950/40 border-b border-neutral-900 hidden" id="actionMetaRow">
 <select id="actionReasonSelect" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 focus:outline-none">
 <option value="Порча / Брак">❌ Порча / Брак на смене</option>
@@ -152,56 +146,39 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 <option value="Усушка / Пересорт">⚖️ Усушка / Пересорт сырья</option>
 </select>
 </div>
-
-<div class="p-4 bg-neutral-950 sticky top-0 z-10 space-y-3">
-<input type="text" id="actionSearch" oninput="filterActionItems()" placeholder="Поиск продукта из 1С..." class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-300 focus:outline-none">
-</div>
-
-<div class="flex-1 overflow-y-auto px-4 pb-24" id="actionItemsList">
-</div>
-
-<div class="fixed bottom-0 left-0 right-0 p-4 bg-neutral-950/90 backdrop-blur border-t border-neutral-900 flex gap-3">
-<button onclick="submitActionData()" class="flex-1 bg-white text-black font-bold py-3.5 rounded-xl active:scale-[0.98] transition shadow-lg">Отправить данные на бэкенд</button>
-</div>
+<div class="p-4 bg-neutral-950 sticky top-0 z-10"><input type="text" id="actionSearch" oninput="filterActionItems()" placeholder="Поиск продукта..." class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-300 focus:outline-none"></div>
+<div class="flex-1 overflow-y-auto px-4 pb-24" id="actionItemsList"></div>
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-neutral-950/90 backdrop-blur border-t border-neutral-900 flex gap-3"><button onclick="submitActionData()" class="flex-1 bg-white text-black font-bold py-3.5 rounded-xl active:scale-[0.98] transition">Отправить данные</button></div>
 </div>
 
 <script>
-// ВСТАВЬТЕ СЮДА ВАШ URL РАЗВЕРТЫВАНИЯ ИЗ GOOGLE ТАБЛИЦ
+// ОБЯЗАТЕЛЬНО ПОДСТАВЬТЕ СЮДА СВОЮ ССЫЛКУ РАЗВЕРТЫВАНИЯ GOOGLE
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec";
 
 let appData = { schedule: [], position: "Повар", rate: 0, recipes: [], items1c: [], info: [], fines: [] };
-let currentUser = null;
-let currentTab = 'home';
-let selectedCategory = 'Все';
-let activeModalRecipe = null;
-let activeActionType = 'inventory';
+let currentUser = null; let currentTab = 'home'; let selectedCategory = 'Все'; let activeModalRecipe = null; let activeActionType = 'inventory';
 
-// Инициализация при загрузке
 window.onload = () => {
 const savedUser = localStorage.getItem('kitchen_user');
-if (savedUser) {
-currentUser = JSON.parse(savedUser);
-document.getElementById('authScreen').classList.add('hidden');
-loadAppData();
-}
+if (savedUser) { currentUser = JSON.parse(savedUser); showApp(); }
 };
 
 function handleLogin() {
 let log = document.getElementById('loginInput').value.trim();
 let pas = document.getElementById('passInput').value.trim();
 if(!log || !pas) return;
-
-document.getElementById('authError').classList.add('hidden');
-
-fetch(WEB_APP_URL, {
-method: "POST",
-mode: "no-cors",
-body: JSON.stringify({ action: "login", login: log, password: pas })
-});
-
-// Для простоты развертывания делаем локальное сохранение сессии
+fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "login", login: log, password: pas }) });
 currentUser = { name: log, role: "Повар" };
 localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
+showApp();
+}
+
+function handleLogout() {
+localStorage.removeItem('kitchen_user');
+location.reload();
+}
+
+function showApp() {
 document.getElementById('authScreen').classList.add('hidden');
 loadAppData();
 }
@@ -209,17 +186,10 @@ loadAppData();
 function loadAppData() {
 if(!currentUser) return;
 document.getElementById('userNameText').innerText = currentUser.name;
-
 fetch(`${WEB_APP_URL}?action=getAppData&userName=${encodeURIComponent(currentUser.name)}`)
-.then(res => res.json())
-.then(data => {
-if(data.status === "success") {
-appData = data;
-renderHome();
-renderTtkCategories();
-renderTtkList();
-}
-}).catch(err => console.error("Ошибка загрузки данных:", err));
+.then(res => res.json()).then(data => {
+if(data.status === "success") { appData = data; renderHome(); renderTtkCategories(); renderTtkList(); }
+});
 }
 
 function switchTab(tab) {
@@ -235,47 +205,23 @@ document.getElementById(`btn-${tab}`).className = "flex flex-col items-center sp
 function renderHome() {
 document.getElementById('userRoleText').innerText = appData.position;
 document.getElementById('userRateText').innerText = `Ставка: ${appData.rate} ₽`;
-
-// Объявления
 if(appData.info && appData.info.length > 0) {
 document.getElementById('infoBlock').classList.remove('hidden');
 document.getElementById('infoTitle').innerText = `🔥 ${appData.info[0].title}`;
 document.getElementById('infoText').innerText = appData.info[0].text;
 }
-
-// Календарь
-let grid = document.getElementById('calendarGrid');
-grid.innerHTML = '';
+let grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
 for(let d = 1; d <= 31; d++) {
 let shift = appData.schedule.find(s => s.day === d);
 let isWork = shift && shift.shift !== "" && shift.shift.toLowerCase() !== "о";
-grid.innerHTML += `
-<div class="aspect-square flex flex-col items-center justify-center rounded-xl border ${isWork ? 'bg-white text-black border-white' : 'bg-neutral-900/40 border-neutral-800/40 text-neutral-500'} p-1 min-w-[40px]">
-<span class="text-[10px] font-bold opacity-60">${d}</span>
-<span class="text-xs font-black mt-0.5">${shift ? shift.shift : '-'}</span>
-</div>
-`;
+grid.innerHTML += `<div class="aspect-square flex flex-col items-center justify-center rounded-xl border ${isWork ? 'bg-white text-black border-white font-bold' : 'bg-neutral-900/40 border-neutral-800/40 text-neutral-500'} p-1 min-w-[40px]"><span class="text-[10px] opacity-60">${d}</span><span class="text-xs font-black mt-0.5">${shift ? shift.shift : '-'}</span></div>`;
 }
-
-// Штрафы / Бонусы
-let fList = document.getElementById('finesList');
-fList.innerHTML = '';
-if(appData.fines.length === 0) {
-fList.innerHTML = `<p class="text-xs text-neutral-500 py-2">Нарушений и бонусов за текущий месяц не обнаружено.</p>`;
-} else {
+let fList = document.getElementById('finesList'); fList.innerHTML = '';
+if(appData.fines.length === 0) { fList.innerHTML = `<p class="text-xs text-neutral-500 py-2">Нарушений и бонусов не обнаружено.</p>`; }
+else {
 appData.fines.forEach(f => {
 let isBonus = f.type.toLowerCase() === 'бонус';
-fList.innerHTML += `
-<div class="bg-neutral-900/40 border border-neutral-900/60 p-3 rounded-xl flex justify-between items-center">
-<div>
-<p class="text-xs font-medium text-neutral-200">${f.reason}</p>
-<p class="text-[10px] text-neutral-500 mt-0.5">${f.date}</p>
-</div>
-<span class="text-xs font-mono font-bold ${isBonus ? 'text-emerald-400' : 'text-red-400'}">
-${isBonus ? '+' : '-'}${f.volume} ₽
-</span>
-</div>
-`;
+fList.innerHTML += `<div class="bg-neutral-900/40 border border-neutral-900/60 p-3 rounded-xl flex justify-between items-center"><div><p class="text-xs font-medium text-neutral-200">${f.reason}</p><p class="text-[10px] text-neutral-500 mt-0.5">${f.date}</p></div><span class="text-xs font-mono font-bold ${isBonus ? 'text-emerald-400' : 'text-red-400'}">${isBonus ? '+' : '-'}${f.volume} ₽</span></div>`;
 });
 }
 }
@@ -283,177 +229,85 @@ ${isBonus ? '+' : '-'}${f.volume} ₽
 function renderTtkCategories() {
 let bar = document.getElementById('categoriesBar');
 let cats = ['Все', ...new Set(appData.recipes.map(r => r.category))];
-bar.innerHTML = cats.map(c => `
-<button onclick="selectCategory('${c}')" class="px-4 py-1.5 text-xs rounded-full whitespace-nowrap border ${selectedCategory === c ? 'bg-white text-black border-white font-semibold' : 'bg-neutral-900 border-neutral-800 text-neutral-400'} transition">
-${c}
-</button>
-`).join('');
+bar.innerHTML = cats.map(c => `<button onclick="selectCategory('${c}')" class="px-4 py-1.5 text-xs rounded-full whitespace-nowrap border ${selectedCategory === c ? 'bg-white text-black border-white font-semibold' : 'bg-neutral-900 border-neutral-800 text-neutral-400'}">${c}</button>`).join('');
 }
-
-function selectCategory(cat) {
-selectedCategory = cat;
-renderTtkCategories();
-filterTtk();
-}
+function selectCategory(cat) { selectedCategory = cat; renderTtkCategories(); filterTtk(); }
 
 function renderTtkList() {
 let container = document.getElementById('ttkList');
 let filtered = appData.recipes.filter(r => selectedCategory === 'Все' || r.category === selectedCategory);
-
-container.innerHTML = filtered.map(r => `
-<div onclick="openTtkModal('${r.name}')" class="bg-neutral-900/40 border border-neutral-800/60 p-3.5 rounded-2xl active:scale-[0.97] transition flex flex-col justify-between h-28 shadow-sm">
-<div>
-<span class="text-[9px] font-bold text-neutral-500 uppercase tracking-wider">${r.category}</span>
-<h4 class="font-bold text-sm text-neutral-200 mt-1 line-clamp-2 leading-snug">${r.name}</h4>
-</div>
-<p class="text-[10px] text-neutral-400 font-medium">Выход: ${r.ingredients[0]?.output || '—'}</p>
-</div>
-`).join('');
+container.innerHTML = filtered.map(r => `<div onclick="openTtkModal('${r.name}')" class="bg-neutral-900/40 border border-neutral-800/60 p-3.5 rounded-2xl flex flex-col justify-between h-28"><div><span class="text-[9px] font-bold text-neutral-500 uppercase tracking-wider">${r.category}</span><h4 class="font-bold text-sm text-neutral-200 mt-1 line-clamp-2">${r.name}</h4></div><p class="text-[10px] text-neutral-400">Выход: ${r.ingredients[0]?.output || '—'}</p></div>`).join('');
 }
 
 function filterTtk() {
 let query = document.getElementById('searchTtk').value.toLowerCase().trim();
 let cards = document.getElementById('ttkList').children;
-let filteredRecipes = appData.recipes.filter(r => selectedCategory === 'Все' || r.category === selectedCategory);
-
-filteredRecipes.forEach((r, idx) => {
-if(cards[idx]) {
-let match = r.name.toLowerCase().includes(query) || r.ingredients.some(i => i.name.toLowerCase().includes(query));
-cards[idx].style.display = match ? 'flex' : 'none';
-}
+appData.recipes.filter(r => selectedCategory === 'Все' || r.category === selectedCategory).forEach((r, idx) => {
+if(cards[idx]) { cards[idx].style.display = (r.name.toLowerCase().includes(query) || r.ingredients.some(i => i.name.toLowerCase().includes(query))) ? 'flex' : 'none'; }
 });
 }
 
 function openTtkModal(name) {
-let r = appData.recipes.find(rec => rec.name === name);
-if(!r) return;
-activeModalRecipe = r;
-
+let r = appData.recipes.find(rec => rec.name === name); if(!r) return; activeModalRecipe = r;
 document.getElementById('modalRecipeCategory').innerText = r.category;
 document.getElementById('modalRecipeName').innerText = r.name;
 document.getElementById('modalRecipeOutput').innerText = `Выход: ${r.ingredients[0]?.output || '—'}`;
-document.getElementById('ttkMultiplier').value = 1;
-
-recalcTtk(1);
+document.getElementById('ttkMultiplier').value = 1; recalcTtk(1);
 document.getElementById('ttkModal').classList.remove('hidden');
 }
 
 function recalcTtk(mStr) {
-if(!activeModalRecipe) return;
-let m = parseFloat(mStr) || 0;
-if(m < 0) m = 0;
-
+if(!activeModalRecipe) return; let m = parseFloat(mStr) || 0; if(m < 0) m = 0;
 document.getElementById('modalTtkBody').innerHTML = activeModalRecipe.ingredients.map(i => `
 <tr class="border-b border-neutral-800/40">
-<td class="py-2.5 font-medium pr-2 text-neutral-200">${i.name}</td>
+<td class="py-2.5 font-medium text-neutral-200">${i.name}</td>
 <td class="py-2.5 text-center text-neutral-500 uppercase text-[10px]">${i.unit}</td>
 <td class="py-2.5 text-right font-mono text-neutral-400 font-bold">${(i.brutto * m).toFixed(3).replace(/\.000$/, '')}</td>
-</tr>
-`).join('');
+</tr>`).join('');
 }
-
-function closeTtkModal() {
-document.getElementById('ttkModal').classList.add('hidden');
-activeModalRecipe = null;
-}
+function closeTtkModal() { document.getElementById('ttkModal').classList.add('hidden'); }
 
 function openActionModal(type) {
-activeActionType = type;
-document.getElementById('actionModal').classList.remove('hidden');
-document.getElementById('actionSearch').value = '';
-
-let title = "Вечерний инвентарь";
-document.getElementById('actionMetaRow').classList.add('hidden');
-
-if(type === 'writeoff') {
-title = "Списание: Брак / Порча";
-document.getElementById('actionMetaRow').classList.remove('hidden');
-} else if(type === 'dinner') {
-title = "Акт питания персонала";
-}
-
-document.getElementById('actionModalTitle').innerText = title;
-renderActionItems();
+activeActionType = type; document.getElementById('actionModal').classList.remove('hidden'); document.getElementById('actionSearch').value = '';
+let title = "Инвентаризация"; document.getElementById('actionMetaRow').classList.add('hidden');
+if(type === 'writeoff') { title = "Списание: Брак / Порча"; document.getElementById('actionMetaRow').classList.remove('hidden'); }
+else if(type === 'dinner') { title = "Акт питания персонала"; }
+document.getElementById('actionModalTitle').innerText = title; renderActionItems();
 }
 
 function renderActionItems() {
-let container = document.getElementById('actionItemsList');
-container.innerHTML = appData.items1c.map((item, idx) => `
+document.getElementById('actionItemsList').innerHTML = appData.items1c.map((item, idx) => `
 <div class="action-item-row py-3 border-b border-neutral-900 flex justify-between items-center gap-4" data-name="${item.name.toLowerCase()}">
-<div class="flex-1">
-<p class="text-sm font-medium text-neutral-200 leading-tight">${item.name}</p>
-<p class="text-[10px] text-neutral-500 uppercase mt-0.5">${item.unit}</p>
-</div>
-<input type="number" step="0.001" placeholder="0.00" class="action-val-input w-24 bg-neutral-900 border border-neutral-800 rounded-lg px-2 py-1.5 text-right font-mono text-sm focus:outline-none focus:border-neutral-600" data-idx="${idx}">
-</div>
-`).join('');
+<div class="flex-1"><p class="text-sm font-medium text-neutral-200">${item.name}</p><p class="text-[10px] text-neutral-500 uppercase mt-0.5">${item.unit}</p></div>
+<input type="number" step="0.001" placeholder="0.00" class="action-val-input w-24 bg-neutral-900 border border-neutral-800 rounded-lg px-2 py-1.5 text-right text-neutral-100 font-mono text-sm" data-idx="${idx}">
+</div>`).join('');
 }
 
 function filterActionItems() {
 let query = document.getElementById('actionSearch').value.toLowerCase().trim();
-let rows = document.getElementById('actionItemsList').getElementsByClassName('action-item-row');
-Array.from(rows).forEach(row => {
-let name = row.getAttribute('data-name');
-row.style.display = name.includes(query) ? 'flex' : 'none';
+Array.from(document.getElementById('actionItemsList').getElementsByClassName('action-item-row')).forEach(row => {
+row.style.display = row.getAttribute('data-name').includes(query) ? 'flex' : 'none';
 });
 }
-
-function closeActionModal() {
-document.getElementById('actionModal').classList.add('hidden');
-}
+function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
 
 function submitActionData() {
-let inputs = document.getElementById('actionItemsList').getElementsByClassName('action-val-input');
 let payload = {
 action: activeActionType === 'inventory' ? 'inventory' : (activeActionType === 'writeoff' ? 'writeOff' : 'staffDinner'),
-userName: currentUser.name,
-items: [],
-title: activeActionType === 'dinner' ? "Обед стаффа" : "",
+userName: currentUser.name, items: [], title: activeActionType === 'dinner' ? "Обед стаффа" : "",
 reason: activeActionType === 'writeoff' ? document.getElementById('actionReasonSelect').value : ""
 };
-
-Array.from(inputs).forEach(inp => {
+Array.from(document.getElementById('actionItemsList').getElementsByClassName('action-val-input')).forEach(inp => {
 let v = parseFloat(inp.value) || 0;
-if(v > 0) {
-let idx = parseInt(inp.getAttribute('data-idx'));
-let originalItem = appData.items1c[idx];
-payload.items.push({ name: originalItem.name, unit: originalItem.unit, volume: v });
-}
+if(v > 0) { let idx = parseInt(inp.getAttribute('data-idx')); let ori = appData.items1c[idx]; payload.items.push({ name: ori.name, unit: ori.unit, volume: v }); }
 });
-
-if(payload.items.length === 0) {
-alert("Введите количество хотя бы для одного продукта!");
-return;
-}
-
-// Для списаний и питания отправляем одиночные/пакетные запросы в зависимости от структуры doPost
+if(payload.items.length === 0) return;
 if(activeActionType === 'writeoff') {
-// Отправка единичных строк
-payload.items.forEach(item => {
-fetch(WEB_APP_URL, {
-method: "POST",
-mode: "no-cors",
-body: JSON.stringify({
-action: "writeOff",
-userName: currentUser.name,
-name: item.name,
-unit: item.unit,
-volume: item.volume,
-reason: payload.reason
-})
-});
-});
+payload.items.forEach(item => { fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "writeOff", userName: currentUser.name, name: item.name, unit: item.unit, volume: item.volume, reason: payload.reason }) }); });
 } else {
-// Инвентаризация и Питание уходят пакетом
-fetch(WEB_APP_URL, {
-method: "POST",
-mode: "no-cors",
-body: JSON.stringify(payload)
-});
+fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
 }
-
-alert("Данные успешно отправлены в таблицу!");
-closeActionModal();
+alert("Данные успешно отправлены!"); closeActionModal();
 }
 </script>
 </body>
