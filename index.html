@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Кухня: Управление и ТТК</title>
+<title>Кухня: Управление, ТТК и Учет смен</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -46,18 +46,29 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 <main id="mainContent" class="flex-1 px-4 py-4 space-y-6 overflow-y-auto">
 
 <div id="section-home" class="space-y-6">
+<div class="bg-neutral-900/40 border border-neutral-800/80 rounded-2xl p-4 space-y-3 shadow-sm">
+<h3 class="text-xs font-bold uppercase tracking-wider text-neutral-500">Баланс за текущий месяц</h3>
+<div class="flex justify-between items-baseline">
+<span class="text-xs text-neutral-400">Отработано смен: <strong id="statsTotalShifts" class="text-neutral-200 font-mono">0</strong></span>
+<span class="text-2xl font-black text-white font-mono" id="statsNetEarnings">0 ₽</span>
+</div>
+<div class="pt-2 border-t border-neutral-900 text-[10px] text-neutral-500 leading-normal">
+* Расчет предварительный. Если вы обнаружили неточность в отработанных сменах, немедленно сообщите об этом шеф-повару или су-шефу для сверки данных.
+</div>
+</div>
+
 <div id="infoBlock" class="hidden bg-neutral-900/50 border border-neutral-800/60 rounded-2xl p-4 space-y-2">
 <h3 id="infoTitle" class="font-bold text-sm text-amber-400">🔥 ОБЪЯВЛЕНИЕ</h3>
 <p id="infoText" class="text-xs text-neutral-400 leading-relaxed"></p>
 </div>
 
 <div class="space-y-3">
-<h3 class="text-xs font-bold uppercase tracking-wider text-neutral-500">Мой график смен</h3>
+<h3 class="text-xs font-bold uppercase tracking-wider text-neutral-500">Мой табель смен</h3>
 <div id="calendarGrid" class="grid grid-cols-7 gap-2 bg-neutral-900/30 border border-neutral-900 p-3 rounded-2xl overflow-x-auto"></div>
 </div>
 
 <div class="space-y-3">
-<h3 class="text-xs font-bold uppercase tracking-wider text-neutral-500">Финансовый отчет и Штрафы</h3>
+<h3 class="text-xs font-bold uppercase tracking-wider text-neutral-500">Детализация бонусов и штрафов</h3>
 <div id="finesList" class="space-y-2"></div>
 </div>
 </div>
@@ -69,6 +80,38 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 
 <div id="section-actions" class="space-y-4 hidden">
+
+<div id="adminPanelBlock" class="hidden bg-neutral-900/30 border border-neutral-800/60 rounded-2xl p-4 space-y-4">
+<div class="border-b border-neutral-900 pb-2">
+<h4 class="font-bold text-amber-400 text-sm tracking-wide uppercase">⚙️ Панель управления сменами</h4>
+<p class="text-[11px] text-neutral-500 mt-0.5">Доступно только: Шеф, Су-шеф, Директор</p>
+</div>
+<div class="space-y-3">
+<div>
+<label class="text-[11px] text-neutral-400 block mb-1">Сотрудник:</label>
+<select id="adminWorkerSelect" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-neutral-200 focus:outline-none"></select>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="text-[11px] text-neutral-400 block mb-1">Число месяца:</label>
+<select id="adminDaySelect" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-neutral-200 focus:outline-none"></select>
+</div>
+<div>
+<label class="text-[11px] text-neutral-400 block mb-1">Значение смены:</label>
+<select id="adminShiftSelect" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-neutral-200 focus:outline-none">
+<option value="1">1 (Полная смена)</option>
+<option value="0.5">0.5 (Полсмены)</option>
+<option value="О">О (Выходной)</option>
+<option value="Х">Х (Больничный)</option>
+</select>
+</div>
+</div>
+<button onclick="submitShiftConfirmation()" class="w-full bg-amber-500 text-black font-bold py-2.5 rounded-xl text-sm active:scale-[0.98] transition mt-2">Утвердить смену в табель</button>
+</div>
+</div>
+
+<div class="space-y-3">
+<h4 class="text-xs font-bold uppercase tracking-wider text-neutral-500 px-1">Журналы учета кухни</h4>
 <button onclick="openActionModal('inventory')" class="w-full bg-neutral-900 border border-neutral-800/80 rounded-2xl p-4 flex items-center justify-between active:scale-[0.99] transition">
 <div class="text-left">
 <h4 class="font-semibold text-neutral-200">Инвентаризация</h4>
@@ -92,6 +135,7 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 <span class="text-neutral-600">→</span>
 </button>
+</div>
 </div>
 </main>
 
@@ -156,20 +200,16 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </select>
 </div>
 
-<div class="p-4 bg-neutral-950 sticky top-0 z-10">
-<input type="text" id="actionSearch" oninput="filterActionItems()" placeholder="Поиск продукта..." class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-300 focus:outline-none">
-</div>
-
+<div class="p-4 bg-neutral-950 sticky top-0 z-10"><input type="text" id="actionSearch" oninput="filterActionItems()" placeholder="Поиск продукта..." class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-300 focus:outline-none"></div>
 <div class="flex-1 overflow-y-auto px-4 pb-24" id="actionItemsList"></div>
-<div class="fixed bottom-0 left-0 right-0 p-4 bg-neutral-950/90 backdrop-blur border-t border-neutral-900 flex gap-3">
-<button onclick="submitActionData()" class="flex-1 bg-white text-black font-bold py-3.5 rounded-xl active:scale-[0.98] transition">Отправить данные на бэкенд</button>
-</div>
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-neutral-950/90 backdrop-blur border-t border-neutral-900 flex gap-3"><button onclick="submitActionData()" class="flex-1 bg-white text-black font-bold py-3.5 rounded-xl active:scale-[0.98] transition">Отправить данные на бэкенд</button></div>
 </div>
 
 <script>
+// ВСТАВЬТЕ СЮДА СВОЮ ССЫЛКУ РАЗВЕРТЫВАНИЯ
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec";
 
-let appData = { schedule: [], position: "Повар", rate: 0, recipes: [], items1c: [], info: [], fines: [] };
+let appData = { schedule: [], position: "Повар", rate: 0, role: "Повар", recipes: [], items1c: [], info: [], fines: [], allUsers: [] };
 let currentUser = null; let currentTab = 'home'; let selectedCategory = 'Все'; let activeModalRecipe = null; let activeActionType = 'inventory';
 
 window.onload = () => {
@@ -202,8 +242,61 @@ if(!currentUser) return;
 document.getElementById('userNameText').innerText = currentUser.name;
 fetch(`${WEB_APP_URL}?action=getAppData&userName=${encodeURIComponent(currentUser.name)}`)
 .then(res => res.json()).then(data => {
-if(data.status === "success") { appData = data; renderHome(); renderTtkCategories(); renderTtkList(); }
+if(data.status === "success") {
+appData = data;
+currentUser.role = data.role;
+localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
+renderHome();
+renderTtkCategories();
+renderTtkList();
+checkAdminStatus();
+}
 });
+}
+
+function checkAdminStatus() {
+let role = appData.role ? appData.role.toLowerCase().trim() : "повар";
+let adminRoles = ["шеф-повар", "шеф", "су-шеф", "директор"];
+if(adminRoles.includes(role)) {
+document.getElementById('adminPanelBlock').classList.remove('hidden');
+renderAdminSelects();
+} else {
+document.getElementById('adminPanelBlock').classList.add('hidden');
+}
+}
+
+function renderAdminSelects() {
+// Заполнение выпадающего списка сотрудников
+let workerSelect = document.getElementById('adminWorkerSelect');
+workerSelect.innerHTML = appData.allUsers.map(u => `<option value="${u}">${u}</option>`).join('');
+
+// Заполнение списка дней (1-31)
+let daySelect = document.getElementById('adminDaySelect');
+let today = new Date().getDate();
+daySelect.innerHTML = Array.from({length: 31}, (_, i) => i + 1)
+.map(d => `<option value="${d}" ${d === today ? 'selected' : ''}>${d} число</option>`).join('');
+}
+
+function submitShiftConfirmation() {
+let employee = document.getElementById('adminWorkerSelect').value;
+let day = document.getElementById('adminDaySelect').value;
+let val = document.getElementById('adminShiftSelect').value;
+
+if(!employee || !day || !val) return;
+
+fetch(WEB_APP_URL, {
+method: "POST",
+mode: "no-cors",
+body: JSON.stringify({
+action: "confirmShift",
+employeeName: employee,
+day: day,
+shiftValue: val
+})
+});
+
+alert(`Смена сотрудника ${employee} за ${day}-е число успешно сохранена в Google Таблицу!`);
+loadAppData(); // Перегружаем данные с бэкенда для обновления табеля
 }
 
 function switchTab(tab) {
@@ -219,17 +312,38 @@ document.getElementById(`btn-${tab}`).className = "flex flex-col items-center sp
 function renderHome() {
 document.getElementById('userRoleText').innerText = appData.position;
 document.getElementById('userRateText').innerText = `Ставка: ${appData.rate} ₽`;
+
+// Расчет финансового блока (Новая фича)
+let totalShifts = 0;
+appData.schedule.forEach(s => {
+let shiftNum = parseFloat(s.shift.toString().replace(',', '.'));
+if(!isNaN(shiftNum)) { totalShifts += shiftNum; }
+});
+
+let baseEarnings = totalShifts * appData.rate;
+let totalFines = 0; let totalBonuses = 0;
+appData.fines.forEach(f => {
+if(f.type.toLowerCase() === 'штраф') totalFines += f.volume;
+if(f.type.toLowerCase() === 'бонус') totalBonuses += f.volume;
+});
+let netEarnings = baseEarnings + totalBonuses - totalFines;
+
+document.getElementById('statsTotalShifts').innerText = totalShifts;
+document.getElementById('statsNetEarnings').innerText = `${netEarnings.toLocaleString('ru-RU')} ₽`;
+
 if(appData.info && appData.info.length > 0) {
 document.getElementById('infoBlock').classList.remove('hidden');
 document.getElementById('infoTitle').innerText = `🔥 ${appData.info[0].title}`;
 document.getElementById('infoText').innerText = appData.info[0].text;
 }
+
 let grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
 for(let d = 1; d <= 31; d++) {
 let shift = appData.schedule.find(s => s.day === d);
-let isWork = shift && shift.shift !== "" && shift.shift.toLowerCase() !== "о";
+let isWork = shift && shift.shift !== "" && shift.shift.toLowerCase() !== "о" && shift.shift.toLowerCase() !== "х";
 grid.innerHTML += `<div class="aspect-square flex flex-col items-center justify-center rounded-xl border ${isWork ? 'bg-white text-black border-white font-bold' : 'bg-neutral-900/40 border-neutral-800/40 text-neutral-500'} p-1 min-w-[40px]"><span class="text-[10px] opacity-60">${d}</span><span class="text-xs font-black mt-0.5">${shift ? shift.shift : '-'}</span></div>`;
 }
+
 let fList = document.getElementById('finesList'); fList.innerHTML = '';
 if(appData.fines.length === 0) { fList.innerHTML = `<p class="text-xs text-neutral-500 py-2">Нарушений и бонусов не обнаружено.</p>`; }
 else {
@@ -284,11 +398,7 @@ function closeTtkModal() { document.getElementById('ttkModal').classList.add('hi
 function toggleIndividualInput() {
 let select = document.getElementById('actionReasonSelect');
 let input = document.getElementById('actionStaffNameInput');
-if(select.value === 'Индивидуальное списание') {
-input.classList.remove('hidden');
-} else {
-input.classList.add('hidden');
-}
+if(select.value === 'Индивидуальное списание') { input.classList.remove('hidden'); } else { input.classList.add('hidden'); }
 }
 
 function openActionModal(type) {
@@ -300,14 +410,8 @@ document.getElementById('actionStaffNameInput').classList.add('hidden');
 document.getElementById('actionStaffNameInput').value = '';
 document.getElementById('actionReasonSelect').value = 'Порча';
 
-if(type === 'writeoff') {
-title = "Списание: Брак / Порча";
-document.getElementById('actionMetaRow').classList.remove('hidden');
-}
-else if(type === 'dinner') {
-title = "Акт питания персонала";
-document.getElementById('dinnerMetaRow').classList.remove('hidden');
-}
+if(type === 'writeoff') { title = "Списание: Брак / Порча"; document.getElementById('actionMetaRow').classList.remove('hidden'); }
+else if(type === 'dinner') { title = "Акт питания персонала"; document.getElementById('dinnerMetaRow').classList.remove('hidden'); }
 document.getElementById('actionModalTitle').innerText = title; renderActionItems();
 }
 
@@ -329,52 +433,26 @@ function closeActionModal() { document.getElementById('actionModal').classList.a
 
 function submitActionData() {
 let inputs = document.getElementById('actionItemsList').getElementsByClassName('action-val-input');
-
 let reasonVal = document.getElementById('actionReasonSelect').value;
 if(reasonVal === 'Индивидуальное списание') {
 let staffName = document.getElementById('actionStaffNameInput').value.trim();
-if(!staffName) {
-alert("Пожалуйста, укажите фамилию сотрудника!");
-return;
-}
+if(!staffName) { alert("Укажите фамилию!"); return; }
 reasonVal = `Индивидуальное списание (${staffName})`;
 }
-
 let dinnerTitle = document.getElementById('dinnerTypeSelect').value;
 
 let payload = {
 action: activeActionType === 'inventory' ? 'inventory' : (activeActionType === 'writeoff' ? 'writeOff' : 'staffDinner'),
-userName: currentUser.name,
-items: [],
-title: activeActionType === 'dinner' ? dinnerTitle : "",
+userName: currentUser.name, items: [], title: activeActionType === 'dinner' ? dinnerTitle : "",
 reason: activeActionType === 'writeoff' ? reasonVal : ""
 };
-
 Array.from(inputs).forEach(inp => {
 let v = parseFloat(inp.value) || 0;
 if(v > 0) { let idx = parseInt(inp.getAttribute('data-idx')); let ori = appData.items1c[idx]; payload.items.push({ name: ori.name, unit: ori.unit, volume: v }); }
 });
-
-if(payload.items.length === 0) {
-alert("Введите количество!");
-return;
-}
-
+if(payload.items.length === 0) return;
 if(activeActionType === 'writeoff') {
-payload.items.forEach(item => {
-fetch(WEB_APP_URL, {
-method: "POST",
-mode: "no-cors",
-body: JSON.stringify({
-action: "writeOff",
-userName: currentUser.name,
-name: item.name,
-unit: item.unit,
-volume: item.volume,
-reason: payload.reason
-})
-});
-});
+payload.items.forEach(item => { fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "writeOff", userName: currentUser.name, name: item.name, unit: item.unit, volume: item.volume, reason: payload.reason }) }); });
 } else {
 fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
 }
@@ -383,3 +461,5 @@ alert("Данные успешно отправлены!"); closeActionModal();
 </script>
 </body>
 </html>
+
+
