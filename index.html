@@ -33,20 +33,22 @@
         .elegant-shadow { box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
-<body class="bg-dark text-lighttext min-h-screen flex flex-col pb-20 select-none relative z-0">
+<body class="bg-dark text-lighttext min-h-screen flex flex-col select-none">
 
-    <div class="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
-        <img src="./logo.png" alt="" class="w-80 h-80 object-contain opacity-[0.04] blur-[1px] grayscale">
-    </div>
-
-    <div id="authScreen" class="fixed inset-0 bg-dark z-50 flex flex-col justify-center px-6 relative">
+    <!-- ========================================== -->
+    <!-- ЭКРАН АВТОРИЗАЦИИ ("ЗАКУЛИСЬЕ") -->
+    <!-- ========================================== -->
+    <div id="authScreen" class="fixed inset-0 bg-dark z-50 flex flex-col justify-center px-6 overflow-hidden">
+        
+        <!-- Огромный размытый логотип на фоне входа -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <img src="./logo.png" alt="" class="w-96 h-96 object-contain opacity-[0.03] blur-[2px] grayscale">
+            <img src="./logo.png" alt="" class="w-[600px] h-[600px] object-contain opacity-[0.03] blur-[2px] grayscale">
         </div>
 
         <div class="space-y-6 max-w-sm w-full mx-auto text-center relative z-10 -mt-10">
-            <div class="flex justify-center mb-2">
-                <img src="./logo.png" alt="Логотип" class="w-24 h-24 object-contain drop-shadow-[0_0_15px_rgba(212,175,55,0.2)]" onerror="this.style.display='none'">
+            <!-- Увеличенный в 2 раза главный логотип -->
+            <div class="flex justify-center mb-4">
+                <img src="./logo.png" alt="Логотип" class="w-48 h-48 object-contain drop-shadow-[0_0_20px_rgba(212,175,55,0.25)]" onerror="this.style.display='none'">
             </div>
             
             <div>
@@ -56,6 +58,7 @@
                 <p class="text-mutedtext text-lg font-serif italic tracking-widest mt-3 border-b border-bordercolor inline-block pb-0.5 px-2">Закулисье</p>
             </div>
 
+            <!-- Блок ввода данных -->
             <div class="space-y-4 bg-card/80 backdrop-blur-md p-6 rounded-xl border border-bordercolor elegant-shadow mt-4">
                 <input type="text" id="loginInput" placeholder="Имя Фамилия" class="w-full bg-dark/80 border border-bordercolor rounded-lg px-4 py-3 text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold transition font-sans">
                 <input type="password" id="passInput" placeholder="Пароль" class="w-full bg-dark/80 border border-bordercolor rounded-lg px-4 py-3 text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold transition font-sans">
@@ -64,6 +67,7 @@
             <p id="authError" class="text-sm text-red-800 text-center hidden font-serif italic">Неверное имя или пароль</p>
         </div>
 
+        <!-- Цитата шефа -->
         <div class="absolute bottom-8 left-0 right-0 px-8 text-center pointer-events-none relative z-10">
             <p class="text-[12px] text-mutedtext font-serif italic tracking-wide leading-relaxed opacity-70 max-w-[280px] mx-auto">
                 «Секрет великой кухни не в рецептах, а в вашей преданности делу, дисциплине и желании каждый день быть лучше, чем вчера»
@@ -72,132 +76,154 @@
         </div>
     </div>
 
-    <header class="px-4 pt-5 pb-3 border-b border-bordercolor flex justify-between items-center bg-dark/80 backdrop-blur-md sticky top-0 z-30">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full border border-gold flex items-center justify-center bg-card elegant-shadow">
-                <span class="text-gold font-serif text-xl" id="userInitial">Б</span>
-            </div>
-            <div>
-                <h2 id="userNameText" class="font-serif font-bold text-lighttext text-lg leading-tight">Загрузка...</h2>
-                <div class="flex items-center gap-2 mt-0.5">
-                    <p id="userRoleText" class="text-[11px] text-gold uppercase tracking-wider font-semibold">Повар</p>
-                    <button onclick="handleLogout()" class="text-[9px] text-mutedtext uppercase tracking-widest border border-bordercolor px-1.5 py-0.5 rounded hover:text-red-400 active:scale-95 transition">Выйти</button>
-                </div>
-            </div>
-        </div>
-        <div class="text-right">
-            <p id="userRateText" class="text-xs text-mutedtext font-mono">-- ₽</p>
-        </div>
-    </header>
 
-    <main id="mainContent" class="flex-1 px-4 py-5 space-y-6 overflow-y-auto relative z-10">
+    <!-- ========================================== -->
+    <!-- РАБОЧЕЕ ПРИЛОЖЕНИЕ (СКРЫТО ДО ВХОДА) -->
+    <!-- ========================================== -->
+    <div id="appContainer" class="hidden flex-col min-h-screen w-full pb-20 relative z-10">
         
-        <div id="section-home" class="space-y-6">
-            <div class="bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-5 space-y-3 elegant-shadow relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 text-gold opacity-5 text-8xl font-serif">₽</div>
-                <h3 class="text-xs font-serif font-bold uppercase tracking-widest text-goldmuted">Баланс по сегодняшний день</h3>
-                <div class="flex justify-between items-baseline relative z-10">
-                    <span class="text-xs text-mutedtext">Смен отработано: <strong id="statsTotalShifts" class="text-lighttext font-mono text-sm ml-1">0</strong></span>
-                    <span class="text-3xl font-black text-gold font-mono tracking-tight" id="statsNetEarnings">0 ₽</span>
-                </div>
-                <div class="pt-3 border-t border-bordercolor text-[10px] text-mutedtext leading-relaxed font-serif italic">
-                    * Предварительный расчет на текущую дату. Сверяйте отметки в табеле ниже.
-                </div>
-            </div>
-
-            <div id="infoBlock" class="hidden bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 space-y-2">
-                <h3 id="infoTitle" class="font-serif font-bold text-sm text-gold tracking-wider uppercase">ОБЪЯВЛЕНИЕ</h3>
-                <p id="infoText" class="text-sm text-lighttext leading-relaxed font-serif"></p>
-            </div>
-
-            <div class="space-y-3">
-                <h3 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Табель текущего месяца</h3>
-                <div id="calendarGrid" class="grid grid-cols-7 gap-2 bg-card/80 backdrop-blur-sm border border-bordercolor p-3 rounded-xl overflow-x-auto"></div>
-            </div>
-
-            <div class="space-y-3">
-                <h3 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Детализация начислений</h3>
-                <div id="finesList" class="space-y-2"></div>
-            </div>
+        <!-- Огромный размытый логотип на фоне всего приложения -->
+        <div class="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
+            <img src="./logo.png" alt="" class="w-[600px] h-[600px] object-contain opacity-[0.04] blur-[3px] grayscale">
         </div>
 
-        <div id="section-ttk" class="space-y-5 hidden">
-            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="categoriesBar"></div>
-            <input type="text" id="searchTtk" oninput="filterTtk()" placeholder="Поиск по меню..." class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold font-serif italic">
-            <div id="ttkList" class="grid grid-cols-2 gap-3 relative z-10"></div>
-        </div>
+        <!-- ШАПКА ПРИЛОЖЕНИЯ -->
+        <header class="px-4 pt-5 pb-3 border-b border-bordercolor flex justify-between items-center bg-dark/80 backdrop-blur-md sticky top-0 z-30">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full border border-gold flex items-center justify-center bg-card elegant-shadow">
+                    <span class="text-gold font-serif text-xl" id="userInitial">Б</span>
+                </div>
+                <div>
+                    <h2 id="userNameText" class="font-serif font-bold text-lighttext text-lg leading-tight">Загрузка...</h2>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <p id="userRoleText" class="text-[11px] text-gold uppercase tracking-wider font-semibold">Повар</p>
+                        <button onclick="handleLogout()" class="text-[9px] text-mutedtext uppercase tracking-widest border border-bordercolor px-1.5 py-0.5 rounded hover:text-red-400 active:scale-95 transition">Выйти</button>
+                    </div>
+                </div>
+            </div>
+            <div class="text-right">
+                <p id="userRateText" class="text-xs text-mutedtext font-mono">-- ₽</p>
+            </div>
+        </header>
 
-        <div id="section-actions" class="space-y-5 hidden">
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <main id="mainContent" class="flex-1 px-4 py-5 space-y-6 overflow-y-auto relative z-10">
             
-            <div id="adminPanelBlock" class="hidden bg-dark/90 backdrop-blur-md border border-gold rounded-xl p-5 space-y-4 elegant-shadow relative z-10">
-                <div class="border-b border-bordercolor pb-3">
-                    <h4 class="font-serif font-bold text-gold text-lg tracking-widest uppercase">Панель Руководителя</h4>
-                    <p class="text-[10px] text-mutedtext mt-1 uppercase tracking-wider">Назначение смен в табель</p>
+            <!-- ЭКРАН 1: ГРАФИК И ЗАРПЛАТА -->
+            <div id="section-home" class="space-y-6">
+                <div class="bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-5 space-y-3 elegant-shadow relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-gold opacity-5 text-8xl font-serif">₽</div>
+                    <h3 class="text-xs font-serif font-bold uppercase tracking-widest text-goldmuted">Баланс по сегодняшний день</h3>
+                    <div class="flex justify-between items-baseline relative z-10">
+                        <span class="text-xs text-mutedtext">Смен отработано: <strong id="statsTotalShifts" class="text-lighttext font-mono text-sm ml-1">0</strong></span>
+                        <span class="text-3xl font-black text-gold font-mono tracking-tight" id="statsNetEarnings">0 ₽</span>
+                    </div>
+                    <div class="pt-3 border-t border-bordercolor text-[10px] text-mutedtext leading-relaxed font-serif italic">
+                        * Предварительный расчет на текущую дату. Сверяйте отметки в табеле ниже.
+                    </div>
                 </div>
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-xs text-mutedtext block mb-1.5 font-serif italic">Сотрудник кухни:</label>
-                        <select id="adminWorkerSelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none"></select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-xs text-mutedtext block mb-1.5 font-serif italic">Число:</label>
-                            <select id="adminDaySelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none"></select>
-                        </div>
-                        <div>
-                            <label class="text-xs text-mutedtext block mb-1.5 font-serif italic">Ставка:</label>
-                            <select id="adminShiftSelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none">
-                                <option value="1">1 (Полная)</option>
-                                <option value="0.5">0.5 (Половина)</option>
-                                <option value="О">О (Выходной)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button onclick="submitShiftConfirmation()" class="w-full bg-gradient-to-r from-goldmuted to-gold text-dark font-serif font-bold tracking-widest uppercase py-3 rounded-lg text-sm active:scale-[0.98] transition mt-2">Утвердить смену</button>
+
+                <div id="infoBlock" class="hidden bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 space-y-2">
+                    <h3 id="infoTitle" class="font-serif font-bold text-sm text-gold tracking-wider uppercase">ОБЪЯВЛЕНИЕ</h3>
+                    <p id="infoText" class="text-sm text-lighttext leading-relaxed font-serif"></p>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Табель текущего месяца</h3>
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-2 bg-card/80 backdrop-blur-sm border border-bordercolor p-3 rounded-xl overflow-x-auto"></div>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Детализация начислений</h3>
+                    <div id="finesList" class="space-y-2"></div>
                 </div>
             </div>
 
-            <div class="space-y-3 relative z-10">
-                <h4 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Документация кухни</h4>
-                <button onclick="openActionModal('inventory')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
-                    <div class="text-left">
-                        <h4 class="font-serif text-lg text-gold font-bold">Инвентаризация</h4>
-                        <p class="text-xs text-mutedtext mt-0.5 font-serif italic">Ввод фактических остатков сырья</p>
-                    </div>
-                    <span class="text-goldmuted">→</span>
-                </button>
-
-                <button onclick="openActionModal('writeoff')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
-                    <div class="text-left">
-                        <h4 class="font-serif text-lg text-[#D47070] font-bold">Порча / Проработка</h4>
-                        <p class="text-xs text-mutedtext mt-0.5 font-serif italic">Списание брака и отработок</p>
-                    </div>
-                    <span class="text-[#D47070]">→</span>
-                </button>
-
-                <button onclick="openActionModal('dinner')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
-                    <div class="text-left">
-                        <h4 class="font-serif text-lg text-[#88B08A] font-bold">Питание Стаффа</h4>
-                        <p class="text-xs text-mutedtext mt-0.5 font-serif italic">Обеды и ужины персонала</p>
-                    </div>
-                    <span class="text-[#88B08A]">→</span>
-                </button>
+            <!-- ЭКРАН 2: БАЗА ТТК -->
+            <div id="section-ttk" class="space-y-5 hidden">
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="categoriesBar"></div>
+                <input type="text" id="searchTtk" oninput="filterTtk()" placeholder="Поиск по меню..." class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold font-serif italic">
+                <div id="ttkList" class="grid grid-cols-2 gap-3 relative z-10"></div>
             </div>
-        </div>
-    </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 h-16 bg-card/95 backdrop-blur-md border-t border-bordercolor flex justify-around items-center z-40 px-2">
-        <button onclick="switchTab('home')" id="btn-home" class="flex flex-col items-center space-y-1 text-gold">
-            <span class="text-xl leading-none">⚜️</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Главная</span>
-        </button>
-        <button onclick="switchTab('ttk')" id="btn-ttk" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
-            <span class="text-xl leading-none">📖</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Меню</span>
-        </button>
-        <button onclick="switchTab('actions')" id="btn-actions" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
-            <span class="text-xl leading-none">⚖️</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Журналы</span>
-        </button>
-    </nav>
+            <!-- ЭКРАН 3: УЧЕТ И АДМИН-ПАНЕЛЬ -->
+            <div id="section-actions" class="space-y-5 hidden">
+                
+                <div id="adminPanelBlock" class="hidden bg-dark/90 backdrop-blur-md border border-gold rounded-xl p-5 space-y-4 elegant-shadow relative z-10">
+                    <div class="border-b border-bordercolor pb-3">
+                        <h4 class="font-serif font-bold text-gold text-lg tracking-widest uppercase">Панель Руководителя</h4>
+                        <p class="text-[10px] text-mutedtext mt-1 uppercase tracking-wider">Назначение смен в табель</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-mutedtext block mb-1.5 font-serif italic">Сотрудник кухни:</label>
+                            <select id="adminWorkerSelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none"></select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-xs text-mutedtext block mb-1.5 font-serif italic">Число:</label>
+                                <select id="adminDaySelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none"></select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-mutedtext block mb-1.5 font-serif italic">Ставка:</label>
+                                <select id="adminShiftSelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none">
+                                    <option value="1">1 (Полная)</option>
+                                    <option value="0.5">0.5 (Половина)</option>
+                                    <option value="О">О (Выходной)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="submitShiftConfirmation()" class="w-full bg-gradient-to-r from-goldmuted to-gold text-dark font-serif font-bold tracking-widest uppercase py-3 rounded-lg text-sm active:scale-[0.98] transition mt-2">Утвердить смену</button>
+                    </div>
+                </div>
 
+                <div class="space-y-3 relative z-10">
+                    <h4 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Документация кухни</h4>
+                    <button onclick="openActionModal('inventory')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
+                        <div class="text-left">
+                            <h4 class="font-serif text-lg text-gold font-bold">Инвентаризация</h4>
+                            <p class="text-xs text-mutedtext mt-0.5 font-serif italic">Ввод фактических остатков сырья</p>
+                        </div>
+                        <span class="text-goldmuted">→</span>
+                    </button>
+
+                    <button onclick="openActionModal('writeoff')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
+                        <div class="text-left">
+                            <h4 class="font-serif text-lg text-[#D47070] font-bold">Порча / Проработка</h4>
+                            <p class="text-xs text-mutedtext mt-0.5 font-serif italic">Списание брака и отработок</p>
+                        </div>
+                        <span class="text-[#D47070]">→</span>
+                    </button>
+
+                    <button onclick="openActionModal('dinner')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
+                        <div class="text-left">
+                            <h4 class="font-serif text-lg text-[#88B08A] font-bold">Питание Стаффа</h4>
+                            <p class="text-xs text-mutedtext mt-0.5 font-serif italic">Обеды и ужины персонала</p>
+                        </div>
+                        <span class="text-[#88B08A]">→</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- НАВИГАЦИЯ -->
+        <nav class="fixed bottom-0 left-0 right-0 h-16 bg-card/95 backdrop-blur-md border-t border-bordercolor flex justify-around items-center z-40 px-2">
+            <button onclick="switchTab('home')" id="btn-home" class="flex flex-col items-center space-y-1 text-gold">
+                <span class="text-xl leading-none">⚜️</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Главная</span>
+            </button>
+            <button onclick="switchTab('ttk')" id="btn-ttk" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
+                <span class="text-xl leading-none">📖</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Меню</span>
+            </button>
+            <button onclick="switchTab('actions')" id="btn-actions" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
+                <span class="text-xl leading-none">⚖️</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Журналы</span>
+            </button>
+        </nav>
+
+    </div> <!-- Конец appContainer -->
+
+    <!-- ========================================== -->
+    <!-- МОДАЛЬНЫЕ ОКНА (Поверх всего) -->
+    <!-- ========================================== -->
     <div id="ttkModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeTtkModal()">
         <div class="bg-card border-t border-gold rounded-t-2xl w-full max-w-md p-6 space-y-5 max-h-[85vh] overflow-y-auto elegant-shadow" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start border-b border-bordercolor pb-4">
@@ -256,6 +282,7 @@
         </div>
     </div>
 
+    <!-- СКРИПТЫ -->
     <script>
         // === ВАША ССЫЛКА НА БЭКЕНД ИЗ GOOGLE APPS SCRIPT ===
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec"; 
@@ -272,6 +299,9 @@
             let log = document.getElementById('loginInput').value.trim();
             let pas = document.getElementById('passInput').value.trim();
             if(!log || !pas) return;
+            
+            document.getElementById('authError').classList.add('hidden');
+            
             fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "login", login: log, password: pas }) });
             currentUser = { name: log, role: "Повар" };
             localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
@@ -281,7 +311,12 @@
         function handleLogout() { localStorage.removeItem('kitchen_user'); location.reload(); }
 
         function showApp() {
+            // ИСПРАВЛЕНИЕ ОШИБКИ СО СЛОЯМИ:
+            // Полностью прячем экран входа и только потом показываем контейнер приложения
             document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            document.getElementById('appContainer').classList.add('flex');
+            
             loadAppData();
         }
 
@@ -301,7 +336,7 @@
                         renderTtkList(); 
                         checkAdminStatus();
                     }
-                });
+                }).catch(err => console.log("Ошибка сети:", err));
         }
 
         function checkAdminStatus() {
