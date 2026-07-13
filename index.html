@@ -468,10 +468,19 @@
                 </div>`).join('');
         }
 
-        function filterActionItems() {
+function filterActionItems() {
             let query = document.getElementById('actionSearch').value.toLowerCase().trim();
             Array.from(document.getElementById('actionItemsList').getElementsByClassName('action-item-row')).forEach(row => {
-                row.style.display = row.getAttribute('data-name').includes(query) ? 'flex' : 'none';
+                // Находим инпут внутри строки и проверяем, есть ли там цифра больше нуля
+                let inputField = row.querySelector('.action-val-input');
+                let val = parseFloat(inputField.value) || 0;
+                
+                // Строка остается на экране, если совпадает текст поиска ИЛИ если в нее уже вписана цифра!
+                if (row.getAttribute('data-name').includes(query) || val > 0) {
+                    row.style.display = 'flex';
+                } else {
+                    row.style.display = 'none';
+                }
             });
         }
         function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
