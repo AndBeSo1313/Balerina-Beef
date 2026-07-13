@@ -309,15 +309,41 @@
             }, 3500);
         }
 
-        function handleLogin() {
+function handleLogin() {
             let log = document.getElementById('loginInput').value.trim();
             let pas = document.getElementById('passInput').value.trim();
             if(!log || !pas) return;
             
-            fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "login", login: log, password: pas }) });
-            currentUser = { name: log, role: "Повар" };
-            localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
-            showApp();
+            document.getElementById('authError').classList.add('hidden');
+            
+            // Меняем текст кнопки, чтобы повар видел процесс
+            let btn = document.querySelector('button[onclick="handleLogin()"]');
+            let originalText = btn.innerText;
+            btn.innerText = "ПРОВЕРКА...";
+            btn.disabled = true;
+            
+            // Стучимся в таблицу и ЖДЕМ ответа
+            fetch(`${WEB_APP_URL}?action=login&login=${encodeURIComponent(log)}&password=${encodeURIComponent(pas)}`)
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    
+                    if(data.status === "success") {
+                        // Если таблица дала добро - пускаем!
+                        currentUser = { name: data.user.name, role: data.user.role };
+                        localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
+                        showApp();
+                    } else {
+                        // Если пароль не подошел - выдаем ошибку и не пускаем!
+                        document.getElementById('authError').classList.remove('hidden');
+                    }
+                })
+                .catch(err => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    showToast("Ошибка связи с сервером");
+                });
         }
 
         function handleLogout() { localStorage.removeItem('kitchen_user'); location.reload(); }
