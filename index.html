@@ -35,26 +35,18 @@
 </head>
 <body class="bg-dark text-lighttext min-h-screen flex flex-col select-none">
 
-    <!-- ========================================== -->
-    <!-- КАСТОМНОЕ УВЕДОМЛЕНИЕ (ВМЕСТО СТАНДАРТНОГО) -->
-    <!-- ========================================== -->
     <div id="customToast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-md border border-gold px-6 py-4 rounded-xl elegant-shadow z-[100] transition-all duration-500 transform -translate-y-32 opacity-0 flex items-center gap-3 w-max max-w-[90vw] pointer-events-none">
         <span class="text-xl leading-none">⚜️</span>
         <p id="toastMessage" class="text-gold font-serif font-bold tracking-widest uppercase text-[11px] sm:text-xs text-center"></p>
     </div>
 
-    <!-- ========================================== -->
-    <!-- ЭКРАН АВТОРИЗАЦИИ ("ЗАКУЛИСЬЕ") -->
-    <!-- ========================================== -->
     <div id="authScreen" class="fixed inset-0 bg-dark z-50 flex flex-col justify-center px-6 overflow-hidden">
         
-        <!-- Огромный размытый логотип на фоне входа -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <img src="./logo.png" alt="" class="w-[600px] h-[600px] object-contain opacity-[0.03] blur-[2px] grayscale">
         </div>
 
         <div class="space-y-6 max-w-sm w-full mx-auto text-center relative z-10 -mt-16">
-            <!-- Главный логотип -->
             <div class="flex justify-center mb-4">
                 <img src="./logo.png" alt="Логотип" class="w-48 h-48 object-contain drop-shadow-[0_0_20px_rgba(212,175,55,0.25)]" onerror="this.style.display='none'">
             </div>
@@ -66,15 +58,14 @@
                 <p class="text-mutedtext text-lg font-serif italic tracking-widest mt-3 border-b border-bordercolor inline-block pb-0.5 px-2">Закулисье</p>
             </div>
 
-            <!-- Блок ввода данных -->
             <div class="space-y-4 bg-card/80 backdrop-blur-md p-6 rounded-xl border border-bordercolor elegant-shadow mt-4">
-                <input type="text" id="loginInput" placeholder="Имя Фамилия" class="w-full bg-dark/80 border border-bordercolor rounded-lg px-4 py-3 text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold transition font-sans">
-                <input type="password" id="passInput" placeholder="Пароль" class="w-full bg-dark/80 border border-bordercolor rounded-lg px-4 py-3 text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold transition font-sans">
-                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-goldmuted to-gold text-dark font-bold font-serif text-lg tracking-widest uppercase py-3 rounded-lg active:scale-[0.98] transition mt-2 shadow-[0_0_15px_rgba(212,175,55,0.2)]">Войти в смену</button>
+                <input type="text" id="loginInput" autocomplete="off" placeholder="Имя Фамилия" class="w-full bg-dark/80 border border-bordercolor rounded-lg px-4 py-3 text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold transition font-sans">
+                <input type="password" id="passInput" autocomplete="new-password" placeholder="Пароль" class="w-full bg-dark/80 border border-bordercolor rounded-lg px-4 py-3 text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold transition font-sans">
+                <button id="loginBtn" onclick="handleLogin()" class="w-full bg-gradient-to-r from-goldmuted to-gold text-dark font-bold font-serif text-lg tracking-widest uppercase py-3 rounded-lg active:scale-[0.98] transition mt-2 shadow-[0_0_15px_rgba(212,175,55,0.2)]">Войти в смену</button>
             </div>
+            <p id="authError" class="text-sm text-[#D47070] text-center hidden font-serif italic font-bold">Неверное имя или пароль!</p>
         </div>
 
-        <!-- Цитата шефа -->
         <div class="absolute bottom-3 left-0 right-0 px-8 text-center pointer-events-none z-10">
             <p class="text-[12px] text-mutedtext font-serif italic tracking-wide leading-relaxed opacity-70 max-w-[280px] mx-auto">
                 «Секрет великой кухни не в рецептах, а в вашей преданности делу, дисциплине и желании каждый день быть лучше, чем вчера»
@@ -83,16 +74,12 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- РАБОЧЕЕ ПРИЛОЖЕНИЕ -->
-    <!-- ========================================== -->
     <div id="appContainer" class="hidden flex-col min-h-screen w-full pb-20 relative z-10">
         
         <div class="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
             <img src="./logo.png" alt="" class="w-[600px] h-[600px] object-contain opacity-[0.04] blur-[3px] grayscale">
         </div>
 
-        <!-- ШАПКА ПРИЛОЖЕНИЯ -->
         <header class="px-4 pt-5 pb-3 border-b border-bordercolor flex justify-between items-center bg-dark/80 backdrop-blur-md sticky top-0 z-30">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full border border-gold flex items-center justify-center bg-card elegant-shadow">
@@ -102,7 +89,7 @@
                     <h2 id="userNameText" class="font-serif font-bold text-lighttext text-lg leading-tight">Загрузка...</h2>
                     <div class="flex items-center gap-2 mt-0.5">
                         <p id="userRoleText" class="text-[11px] text-gold uppercase tracking-wider font-semibold">Повар</p>
-                        <button onclick="handleLogout()" class="text-[9px] text-mutedtext uppercase tracking-widest border border-bordercolor px-1.5 py-0.5 rounded hover:text-red-400 active:scale-95 transition">Выйти</button>
+                        <button onclick="handleLogout()" class="text-[9px] text-mutedtext uppercase tracking-widest border border-bordercolor px-1.5 py-0.5 rounded hover:text-[#D47070] active:scale-95 transition">Выйти</button>
                     </div>
                 </div>
             </div>
@@ -111,7 +98,6 @@
             </div>
         </header>
 
-        <!-- ОСНОВНОЙ КОНТЕНТ -->
         <main id="mainContent" class="flex-1 px-4 py-5 space-y-6 overflow-y-auto relative z-10">
             
             <div id="section-home" class="space-y-6">
@@ -208,7 +194,6 @@
             </div>
         </main>
 
-        <!-- НАВИГАЦИЯ -->
         <nav class="fixed bottom-0 left-0 right-0 h-16 bg-card/95 backdrop-blur-md border-t border-bordercolor flex justify-around items-center z-40 px-2">
             <button onclick="switchTab('home')" id="btn-home" class="flex flex-col items-center space-y-1 text-gold">
                 <span class="text-xl leading-none">⚜️</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Главная</span>
@@ -223,7 +208,6 @@
 
     </div>
 
-    <!-- МОДАЛКА ТТК -->
     <div id="ttkModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeTtkModal()">
         <div class="bg-card border-t border-gold rounded-t-2xl w-full max-w-md p-6 space-y-5 max-h-[85vh] overflow-y-auto elegant-shadow" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start border-b border-bordercolor pb-4">
@@ -251,7 +235,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА УЧЕТА -->
     <div id="actionModal" class="fixed inset-0 bg-dark z-50 flex flex-col hidden">
         <header class="px-4 py-4 border-b border-bordercolor flex justify-between items-center bg-card">
             <h3 id="actionModalTitle" class="font-serif font-bold text-gold text-lg tracking-wide uppercase">Инвентаризация</h3>
@@ -283,9 +266,8 @@
         </div>
     </div>
 
-    <!-- СКРИПТЫ -->
     <script>
-        // === ВАША ССЫЛКА НА БЭКЕНД ИЗ GOOGLE APPS SCRIPT ===
+        // === ВАША ВШИТАЯ ССЫЛКА НА БЭКЕНД ===
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec"; 
 
         let appData = { schedule: [], position: "Повар", rate: 0, role: "Повар", recipes: [], items1c: [], info: [], fines: [], allUsers: [] };
@@ -296,7 +278,7 @@
             if (savedUser) { currentUser = JSON.parse(savedUser); showApp(); }
         };
 
-        // --- ЛОГИКА КАСТОМНЫХ УВЕДОМЛЕНИЙ (TOAST) ---
+        // --- УВЕДОМЛЕНИЯ ---
         function showToast(message) {
             let toast = document.getElementById('customToast');
             document.getElementById('toastMessage').innerText = message;
@@ -309,20 +291,18 @@
             }, 3500);
         }
 
-function handleLogin() {
+        // --- БЕЗОПАСНАЯ АВТОРИЗАЦИЯ ---
+        function handleLogin() {
             let log = document.getElementById('loginInput').value.trim();
             let pas = document.getElementById('passInput').value.trim();
             if(!log || !pas) return;
             
             document.getElementById('authError').classList.add('hidden');
-            
-            // Меняем текст кнопки, чтобы повар видел процесс
-            let btn = document.querySelector('button[onclick="handleLogin()"]');
+            let btn = document.getElementById('loginBtn');
             let originalText = btn.innerText;
             btn.innerText = "ПРОВЕРКА...";
             btn.disabled = true;
             
-            // Стучимся в таблицу и ЖДЕМ ответа
             fetch(`${WEB_APP_URL}?action=login&login=${encodeURIComponent(log)}&password=${encodeURIComponent(pas)}`)
                 .then(res => res.json())
                 .then(data => {
@@ -330,12 +310,10 @@ function handleLogin() {
                     btn.disabled = false;
                     
                     if(data.status === "success") {
-                        // Если таблица дала добро - пускаем!
                         currentUser = { name: data.user.name, role: data.user.role };
                         localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
                         showApp();
                     } else {
-                        // Если пароль не подошел - выдаем ошибку и не пускаем!
                         document.getElementById('authError').classList.remove('hidden');
                     }
                 })
@@ -397,10 +375,8 @@ function handleLogin() {
             let day = document.getElementById('adminDaySelect').value;
             let val = document.getElementById('adminShiftSelect').value;
             if(!employee || !day || !val) return;
-            
             fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "confirmShift", employeeName: employee, day: day, shiftValue: val }) });
-            
-            showToast(`Смена за ${day}-е число утверждена`);
+            showToast(`Смена за ${day} число утверждена`);
             loadAppData(); 
         }
 
@@ -531,14 +507,13 @@ function handleLogin() {
                 </div>`).join('');
         }
 
-        // --- ВОТ ОН, ИСПРАВЛЕННЫЙ "УМНЫЙ" ПОИСК (КОРЗИНА) ---
+        // --- УМНАЯ КОРЗИНА: СОХРАНЯЕМ ВЫБРАННОЕ ---
         function filterActionItems() {
             let query = document.getElementById('actionSearch').value.toLowerCase().trim();
             Array.from(document.getElementById('actionItemsList').getElementsByClassName('action-item-row')).forEach(row => {
                 let inputField = row.querySelector('.action-val-input');
                 let val = parseFloat(inputField.value) || 0;
                 
-                // Если имя совпадает ИЛИ если в ячейку уже вписано количество
                 if (row.getAttribute('data-name').includes(query) || val > 0) {
                     row.style.display = 'flex';
                 } else {
@@ -546,7 +521,6 @@ function handleLogin() {
                 }
             });
         }
-
         function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
 
         function submitActionData() {
