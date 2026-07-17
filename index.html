@@ -129,6 +129,7 @@
             </div>
 
             <div id="section-actions" class="space-y-5 hidden">
+                
                 <div id="adminPanelBlock" class="hidden bg-dark/90 backdrop-blur-md border border-gold rounded-xl p-5 space-y-4 elegant-shadow relative z-10">
                     <div class="border-b border-bordercolor pb-3">
                         <h4 class="font-serif font-bold text-gold text-lg tracking-widest uppercase">Панель Руководителя</h4>
@@ -159,6 +160,7 @@
 
                 <div class="space-y-3 relative z-10">
                     <h4 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Документация кухни</h4>
+                    
                     <button onclick="openActionModal('inventory')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
                         <div class="text-left">
                             <h4 class="font-serif text-lg text-gold font-bold">Инвентаризация</h4>
@@ -167,12 +169,22 @@
                         <span class="text-goldmuted">→</span>
                     </button>
 
+                    <!-- ИЗМЕНЕННАЯ КНОПКА (ТОЛЬКО СПИСАНИЯ) -->
                     <button onclick="openActionModal('writeoff')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
                         <div class="text-left">
-                            <h4 class="font-serif text-lg text-[#D47070] font-bold">Порча / Проработка</h4>
-                            <p class="text-xs text-mutedtext mt-0.5 font-serif italic">Списание брака и отработок</p>
+                            <h4 class="font-serif text-lg text-[#D47070] font-bold">Списание / Порча</h4>
+                            <p class="text-xs text-mutedtext mt-0.5 font-serif italic">Списание брака и продуктов</p>
                         </div>
                         <span class="text-[#D47070]">→</span>
+                    </button>
+
+                    <!-- НОВАЯ КНОПКА ДЛЯ ПРОРАБОТОК -->
+                    <button onclick="openActionModal('prototype')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
+                        <div class="text-left">
+                            <h4 class="font-serif text-lg text-[#A88D4D] font-bold">Акт Проработки</h4>
+                            <p class="text-xs text-mutedtext mt-0.5 font-serif italic">Лаборатория вкуса и расчет выхода</p>
+                        </div>
+                        <span class="text-[#A88D4D]">→</span>
                     </button>
 
                     <button onclick="openActionModal('dinner')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
@@ -199,7 +211,7 @@
         </nav>
     </div>
 
-    <!-- МОДАЛКИ -->
+    <!-- МОДАЛКИ ТТК -->
     <div id="ttkModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeTtkModal()">
         <div class="bg-card border-t border-gold rounded-t-2xl w-full max-w-md p-6 space-y-5 max-h-[85vh] overflow-y-auto elegant-shadow" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start border-b border-bordercolor pb-4">
@@ -233,15 +245,23 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА УЧЕТА (ЕДИНАЯ ДЛЯ ВСЕХ АКТОВ) -->
     <div id="actionModal" class="fixed inset-0 bg-dark z-50 flex flex-col hidden">
         <header class="px-4 py-4 border-b border-bordercolor flex justify-between items-center bg-card">
-            <h3 id="actionModalTitle" class="font-serif font-bold text-gold text-lg tracking-wide uppercase">Инвентаризация</h3>
+            <h3 id="actionModalTitle" class="font-serif font-bold text-gold text-lg tracking-wide uppercase">Действие</h3>
             <button onclick="closeActionModal()" class="text-mutedtext p-1 text-sm font-serif italic">Отмена</button>
         </header>
+        
+        <!-- Поля для Проработки -->
+        <div class="p-4 bg-card border-b border-bordercolor hidden" id="prototypeMetaRow">
+            <input type="text" id="prototypeTitleInput" placeholder="Название блюда / полуфабриката" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif mb-3">
+            <input type="number" id="prototypeOutputInput" step="0.001" placeholder="Итоговый выход (кг/л)" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-gold focus:outline-none font-serif font-bold">
+        </div>
+
         <div class="p-4 bg-card border-b border-bordercolor hidden" id="actionMetaRow">
             <select id="actionReasonSelect" onchange="toggleIndividualInput()" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif">
                 <option value="Порча">Порча</option>
-                <option value="Проработка">Проработка</option>
+                <option value="Проработка (старая)">Проработка (списание)</option>
                 <option value="Индивидуальное списание">Индивидуальное списание (на повара)</option>
             </select>
             <input type="text" id="actionStaffNameInput" placeholder="Фамилия сотрудника" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none mt-3 hidden font-serif italic">
@@ -327,7 +347,6 @@
             document.getElementById('userNameText').innerText = currentUser.name;
             document.getElementById('userInitial').innerText = currentUser.name.charAt(0).toUpperCase();
             
-            // ВЗЛОМЩИК КЭША (Параметр &t=)
             let cacheBuster = new Date().getTime();
             fetch(`${WEB_APP_URL}?action=getAppData&userName=${encodeURIComponent(currentUser.name)}&t=${cacheBuster}`)
                 .then(res => res.json()).then(data => {
@@ -497,15 +516,22 @@
 
         function openActionModal(type) {
             activeActionType = type; document.getElementById('actionModal').classList.remove('hidden'); document.getElementById('actionSearch').value = '';
-            let title = "Инвентаризация"; 
+            
+            // Сбрасываем все доп. поля
             document.getElementById('actionMetaRow').classList.add('hidden');
             document.getElementById('dinnerMetaRow').classList.add('hidden');
+            document.getElementById('prototypeMetaRow').classList.add('hidden');
             document.getElementById('actionStaffNameInput').classList.add('hidden');
             document.getElementById('actionStaffNameInput').value = '';
+            document.getElementById('prototypeTitleInput').value = '';
+            document.getElementById('prototypeOutputInput').value = '';
             document.getElementById('actionReasonSelect').value = 'Порча';
             
+            let title = "Инвентаризация"; 
             if(type === 'writeoff') { title = "Журнал: Брак и Порча"; document.getElementById('actionMetaRow').classList.remove('hidden'); }
             else if(type === 'dinner') { title = "Журнал: Питание Стаффа"; document.getElementById('dinnerMetaRow').classList.remove('hidden'); }
+            else if(type === 'prototype') { title = "Лаборатория: Проработка"; document.getElementById('prototypeMetaRow').classList.remove('hidden'); }
+            
             document.getElementById('actionModalTitle').innerText = title; renderActionItems();
         }
 
@@ -533,24 +559,25 @@
 
         function submitActionData() {
             let inputs = document.getElementById('actionItemsList').getElementsByClassName('action-val-input');
-            let reasonVal = document.getElementById('actionReasonSelect').value;
-            
-            if(reasonVal === 'Индивидуальное списание') {
-                let staffName = document.getElementById('actionStaffNameInput').value.trim();
-                if(!staffName) { 
-                    showToast("Укажите фамилию сотрудника!"); 
-                    return; 
-                }
-                reasonVal = `Индивидуальное списание (${staffName})`;
-            }
-            
-            let dinnerTitle = document.getElementById('dinnerTypeSelect').value;
+            let payload = { action: activeActionType, userName: currentUser.name, items: [] };
 
-            let payload = {
-                action: activeActionType === 'inventory' ? 'inventory' : (activeActionType === 'writeoff' ? 'writeOff' : 'staffDinner'),
-                userName: currentUser.name, items: [], title: activeActionType === 'dinner' ? dinnerTitle : "",
-                reason: activeActionType === 'writeoff' ? reasonVal : ""
-            };
+            // Доп валидация для разных типов актов
+            if (activeActionType === 'writeoff') {
+                let reasonVal = document.getElementById('actionReasonSelect').value;
+                if(reasonVal === 'Индивидуальное списание') {
+                    let staffName = document.getElementById('actionStaffNameInput').value.trim();
+                    if(!staffName) { showToast("Укажите фамилию сотрудника!"); return; }
+                    reasonVal = `Индивидуальное списание (${staffName})`;
+                }
+                payload.reason = reasonVal;
+            } else if (activeActionType === 'dinner') {
+                payload.title = document.getElementById('dinnerTypeSelect').value;
+            } else if (activeActionType === 'prototype') {
+                payload.title = document.getElementById('prototypeTitleInput').value.trim();
+                payload.output = document.getElementById('prototypeOutputInput').value;
+                if(!payload.title) { showToast("Укажите название проработки!"); return; }
+                if(!payload.output || parseFloat(payload.output) <= 0) { showToast("Укажите итоговый выход!"); return; }
+            }
             
             Array.from(inputs).forEach(inp => {
                 let v = parseFloat(inp.value) || 0;
@@ -572,6 +599,7 @@
             if (activeActionType === 'writeoff') successMessage = "Акт списания отправлен";
             if (activeActionType === 'dinner') successMessage = "Акт питания отправлен";
             if (activeActionType === 'inventory') successMessage = "Инвентаризация отправлена";
+            if (activeActionType === 'prototype') successMessage = "Акт проработки отправлен";
             
             showToast(successMessage);
             closeActionModal();
