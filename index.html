@@ -1,630 +1,647 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Закулисье | Балерина и Бифштекс</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        dark: '#110F0E',
-                        card: '#1A1715',
-                        gold: '#D4AF37',
-                        goldmuted: '#A88D4D',
-                        lighttext: '#F2EFE9',
-                        mutedtext: '#989186',
-                        bordercolor: 'rgba(212, 175, 55, 0.2)'
-                    },
-                    fontFamily: {
-                        serif: ['"Cormorant Garamond"', 'serif'],
-                        sans: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .elegant-shadow { box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Закулисье | Балерина и Бифштекс</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+dark: '#110F0E',
+card: '#1A1715',
+gold: '#D4AF37',
+goldmuted: '#A88D4D',
+lighttext: '#F2EFE9',
+mutedtext: '#989186',
+bordercolor: 'rgba(212, 175, 55, 0.2)'
+},
+fontFamily: {
+serif: ['"Cormorant Garamond"', 'serif'],
+sans: ['Inter', 'sans-serif']
+}
+}
+}
+}
+</script>
+<style>
+body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.elegant-shadow { box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+</style>
 </head>
 <body class="bg-dark text-lighttext min-h-screen flex flex-col select-none">
 
-    <!-- Тост -->
-    <div id="customToast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-md border border-gold px-6 py-4 rounded-xl elegant-shadow z-[100] transition-all duration-500 transform -translate-y-32 opacity-0 flex items-center gap-3 w-max max-w-[90vw] pointer-events-none">
-        <span class="text-xl leading-none">⚜️</span>
-        <p id="toastMessage" class="text-gold font-serif font-bold tracking-widest uppercase text-[11px] sm:text-xs text-center"></p>
-    </div>
+<!-- Тост Уведомлений -->
+<div id="customToast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-md border border-gold px-6 py-4 rounded-xl elegant-shadow z-[100] transition-all duration-500 transform -translate-y-32 opacity-0 flex items-center gap-3 w-max max-w-[90vw] pointer-events-none">
+<span class="text-xl leading-none">⚜️</span>
+<p id="toastMessage" class="text-gold font-serif font-bold tracking-widest uppercase text-[11px] sm:text-xs text-center"></p>
+</div>
 
-    <!-- Авторизация -->
-    <div id="authScreen" class="fixed inset-0 bg-dark z-50 flex flex-col justify-center px-6 overflow-hidden">
-        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <img src="./logo.png" alt="" class="w-[600px] h-[600px] object-contain opacity-[0.03] blur-[2px] grayscale">
-        </div>
-        <div class="space-y-6 max-w-sm w-full mx-auto text-center relative z-10 -mt-16">
-            <div class="flex justify-center mb-4">
-                <img src="./logo.png" alt="Логотип" class="w-48 h-48 object-contain drop-shadow-[0_0_20px_rgba(212,175,55,0.25)]" onerror="this.style.display='none'">
-            </div>
-            <div>
-                <h1 class="font-serif text-[28px] sm:text-[32px] text-gold tracking-wide font-bold leading-none">
-                    Балерина <span class="text-goldmuted font-normal text-2xl mx-0.5">&</span> Бифштекс
-                </h1>
-                <p class="text-mutedtext text-lg font-serif italic tracking-widest mt-3 border-b border-bordercolor inline-block pb-0.5 px-2">Закулисье</p>
-            </div>
-            <div class="space-y-4 bg-card/80 backdrop-blur-md p-6 rounded-xl border border-bordercolor elegant-shadow mt-4">
-                <input type="text" id="loginInput" autocomplete="off" placeholder="Имя Фамилия" class="w-full bg-dark/80 border border-bordercolor rounded-lg px-4 py-3 text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold transition font-sans">
-                <input type="password" id="passInput" autocomplete="new-password" placeholder="Пароль" class="w-full bg-dark/80 border border-bordercolor rounded-lg px-4 py-3 text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold transition font-sans">
-                <button id="loginBtn" onclick="handleLogin()" class="w-full bg-gradient-to-r from-goldmuted to-gold text-dark font-bold font-serif text-lg tracking-widest uppercase py-3 rounded-lg active:scale-[0.98] transition mt-2 shadow-[0_0_15px_rgba(212,175,55,0.2)]">Войти в смену</button>
-            </div>
-            <p id="authError" class="text-sm text-[#D47070] text-center hidden font-serif italic font-bold">Неверное имя или пароль!</p>
-        </div>
-    </div>
+<!-- Авторизация -->
+<div id="authScreen" class="fixed inset-0 bg-dark z-50 flex flex-col justify-center px-6 overflow-hidden">
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<img src="./logo.png" alt="" class="w-[600px] h-[600px] object-contain opacity-[0.03] blur-[2px] grayscale">
+</div>
+<div class="space-y-6 max-w-sm w-full mx-auto text-center relative z-10 -mt-16">
+<div class="flex justify-center mb-4">
+<img src="./logo.png" alt="Логотип" class="w-48 h-48 object-contain drop-shadow-[0_0_20px_rgba(212,175,55,0.25)]" onerror="this.style.display='none'">
+</div>
+<div>
+<h1 class="font-serif text-[28px] sm:text-[32px] text-gold tracking-wide font-bold leading-none">
+Балерина <span class="text-goldmuted font-normal text-2xl mx-0.5">&</span> Бифштекс
+</h1>
+<p class="text-mutedtext text-lg font-serif italic tracking-widest mt-3 border-b border-bordercolor inline-block pb-0.5 px-2">Закулисье</p>
+</div>
+<div class="space-y-4 bg-card/80 backdrop-blur-md p-6 rounded-xl border border-bordercolor elegant-shadow mt-4">
+<input type="text" id="loginInput" autocomplete="off" placeholder="Имя Фамилия" class="w-full bg-dark/80 border border-bordercolor rounded-lg px-4 py-3 text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold transition font-sans">
+<input type="password" id="passInput" autocomplete="new-password" placeholder="Пароль" class="w-full bg-dark/80 border border-bordercolor rounded-lg px-4 py-3 text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold transition font-sans">
+<button id="loginBtn" onclick="handleLogin()" class="w-full bg-gradient-to-r from-goldmuted to-gold text-dark font-bold font-serif text-lg tracking-widest uppercase py-3 rounded-lg active:scale-[0.98] transition mt-2 shadow-[0_0_15px_rgba(212,175,55,0.2)]">Войти в смену</button>
+</div>
+<p id="authError" class="text-sm text-[#D47070] text-center hidden font-serif italic font-bold">Неверное имя или пароль!</p>
+</div>
+</div>
 
-    <!-- Основное приложение -->
-    <div id="appContainer" class="hidden flex-col min-h-screen w-full pb-20 relative z-10">
-        <div class="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
-            <img src="./logo.png" alt="" class="w-[600px] h-[600px] object-contain opacity-[0.04] blur-[3px] grayscale">
-        </div>
+<!-- Основное приложение -->
+<div id="appContainer" class="hidden flex-col min-h-screen w-full pb-20 relative z-10">
+<div class="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
+<img src="./logo.png" alt="" class="w-[600px] h-[600px] object-contain opacity-[0.04] blur-[3px] grayscale">
+</div>
 
-        <header class="px-4 pt-5 pb-3 border-b border-bordercolor flex justify-between items-center bg-dark/80 backdrop-blur-md sticky top-0 z-30">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full border border-gold flex items-center justify-center bg-card elegant-shadow">
-                    <span class="text-gold font-serif text-xl" id="userInitial">Б</span>
-                </div>
-                <div>
-                    <h2 id="userNameText" class="font-serif font-bold text-lighttext text-lg leading-tight">Загрузка...</h2>
-                    <div class="flex items-center gap-2 mt-0.5">
-                        <p id="userRoleText" class="text-[11px] text-gold uppercase tracking-wider font-semibold">Повар</p>
-                        <button onclick="handleLogout()" class="text-[9px] text-mutedtext uppercase tracking-widest border border-bordercolor px-1.5 py-0.5 rounded hover:text-[#D47070] active:scale-95 transition">Выйти</button>
-                    </div>
-                </div>
-            </div>
-            <div class="text-right">
-                <p id="userRateText" class="text-xs text-mutedtext font-mono">-- ₽</p>
-            </div>
-        </header>
+<header class="px-4 pt-5 pb-3 border-b border-bordercolor flex justify-between items-center bg-dark/80 backdrop-blur-md sticky top-0 z-30">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border border-gold flex items-center justify-center bg-card elegant-shadow">
+<span class="text-gold font-serif text-xl" id="userInitial">Б</span>
+</div>
+<div>
+<h2 id="userNameText" class="font-serif font-bold text-lighttext text-lg leading-tight">Загрузка...</h2>
+<div class="flex items-center gap-2 mt-0.5">
+<p id="userRoleText" class="text-[11px] text-gold uppercase tracking-wider font-semibold">Повар</p>
+<button onclick="handleLogout()" class="text-[9px] text-mutedtext uppercase tracking-widest border border-bordercolor px-1.5 py-0.5 rounded hover:text-[#D47070] active:scale-95 transition">Выйти</button>
+</div>
+</div>
+</div>
+<div class="text-right">
+<p id="userRateText" class="text-xs text-mutedtext font-mono">-- ₽</p>
+</div>
+</header>
 
-        <main id="mainContent" class="flex-1 px-4 py-5 space-y-6 overflow-y-auto relative z-10">
-            <!-- Главная -->
-            <div id="section-home" class="space-y-6">
-                <div class="bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-5 space-y-3 elegant-shadow relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 text-gold opacity-5 text-8xl font-serif">₽</div>
-                    <h3 class="text-xs font-serif font-bold uppercase tracking-widest text-goldmuted">Баланс по сегодняшний день</h3>
-                    <div class="flex justify-between items-baseline relative z-10">
-                        <span class="text-xs text-mutedtext">Смен отработано: <strong id="statsTotalShifts" class="text-lighttext font-mono text-sm ml-1">0</strong></span>
-                        <span class="text-3xl font-black text-gold font-mono tracking-tight" id="statsNetEarnings">0 ₽</span>
-                    </div>
-                </div>
+<main id="mainContent" class="flex-1 px-4 py-5 space-y-6 overflow-y-auto relative z-10">
+<!-- Главная -->
+<div id="section-home" class="space-y-6">
+<div class="bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-5 space-y-3 elegant-shadow relative overflow-hidden">
+<div class="absolute -right-4 -top-4 text-gold opacity-5 text-8xl font-serif">₽</div>
+<h3 class="text-xs font-serif font-bold uppercase tracking-widest text-goldmuted">Баланс по сегодняшний день</h3>
+<div class="flex justify-between items-baseline relative z-10">
+<span class="text-xs text-mutedtext">Смен отработано: <strong id="statsTotalShifts" class="text-lighttext font-mono text-sm ml-1">0</strong></span>
+<span class="text-3xl font-black text-gold font-mono tracking-tight" id="statsNetEarnings">0 ₽</span>
+</div>
+</div>
 
-                <div id="infoBlock" class="hidden bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 space-y-2">
-                    <h3 id="infoTitle" class="font-serif font-bold text-sm text-gold tracking-wider uppercase">ОБЪЯВЛЕНИЕ</h3>
-                    <p id="infoText" class="text-sm text-lighttext leading-relaxed font-serif"></p>
-                </div>
+<div id="infoBlock" class="hidden bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 space-y-2">
+<h3 id="infoTitle" class="font-serif font-bold text-sm text-gold tracking-wider uppercase">ОБЪЯВЛЕНИЕ</h3>
+<p id="infoText" class="text-sm text-lighttext leading-relaxed font-serif"></p>
+</div>
 
-                <!-- Календарь -->
-                <div class="space-y-3">
-                    <h3 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Табель текущего месяца</h3>
-                    <div id="calendarGrid" class="grid grid-cols-7 gap-2 bg-card/80 backdrop-blur-sm border border-bordercolor p-3 rounded-xl overflow-x-auto"></div>
-                </div>
+<div class="space-y-3">
+<h3 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Табель текущего месяца</h3>
+<div id="calendarGrid" class="grid grid-cols-7 gap-2 bg-card/80 backdrop-blur-sm border border-bordercolor p-3 rounded-xl overflow-x-auto"></div>
+</div>
 
-                <div class="space-y-3">
-                    <h3 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Детализация начислений</h3>
-                    <div id="finesList" class="space-y-2"></div>
-                </div>
-            </div>
+<div class="space-y-3">
+<h3 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Детализация начислений</h3>
+<div id="finesList" class="space-y-2"></div>
+</div>
+</div>
 
-            <!-- Меню ТТК -->
-            <div id="section-ttk" class="space-y-5 hidden">
-                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="categoriesBar"></div>
-                <input type="text" id="searchTtk" oninput="filterTtk()" placeholder="Поиск по меню..." class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold font-serif italic">
-                <div id="ttkList" class="grid grid-cols-2 gap-3 relative z-10"></div>
-            </div>
+<!-- ТТК -->
+<div id="section-ttk" class="space-y-5 hidden">
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="categoriesBar"></div>
+<input type="text" id="searchTtk" oninput="filterTtk()" placeholder="Поиск по меню..." class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold font-serif italic">
+<div id="ttkList" class="grid grid-cols-2 gap-3 relative z-10"></div>
+</div>
 
-            <!-- Журналы -->
-            <div id="section-actions" class="space-y-5 hidden">
-                <div id="adminPanelBlock" class="hidden bg-dark/90 backdrop-blur-md border border-gold rounded-xl p-5 space-y-4 elegant-shadow relative z-10">
-                    <div class="border-b border-bordercolor pb-3">
-                        <h4 class="font-serif font-bold text-gold text-lg tracking-widest uppercase">Панель Руководителя</h4>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <select id="adminWorkerSelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none"></select>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <select id="adminDaySelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none"></select>
-                            <select id="adminShiftSelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none">
-                                <option value="1">1 (Полная)</option><option value="0.5">0.5 (Половина)</option><option value="О">О (Выходной)</option>
-                            </select>
-                        </div>
-                        <button onclick="submitShiftConfirmation()" class="w-full bg-gradient-to-r from-goldmuted to-gold text-dark font-serif font-bold tracking-widest uppercase py-3 rounded-lg text-sm active:scale-[0.98] transition mt-2">Утвердить смену</button>
-                    </div>
-                </div>
+<!-- Журналы -->
+<div id="section-actions" class="space-y-5 hidden">
+<div id="adminPanelBlock" class="hidden bg-dark/90 backdrop-blur-md border border-gold rounded-xl p-5 space-y-4 elegant-shadow relative z-10">
+<div class="border-b border-bordercolor pb-3">
+<h4 class="font-serif font-bold text-gold text-lg tracking-widest uppercase">Панель Руководителя</h4>
+</div>
+<div class="space-y-4">
+<div>
+<select id="adminWorkerSelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none"></select>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<select id="adminDaySelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none"></select>
+<select id="adminShiftSelect" class="w-full bg-card border border-bordercolor rounded-lg px-3 py-2.5 text-sm text-lighttext focus:outline-none">
+<option value="1">1 (Полная)</option><option value="0.5">0.5 (Половина)</option><option value="О">О (Выходной)</option>
+</select>
+</div>
+<button onclick="submitShiftConfirmation()" class="w-full bg-gradient-to-r from-goldmuted to-gold text-dark font-serif font-bold tracking-widest uppercase py-3 rounded-lg text-sm active:scale-[0.98] transition mt-2">Утвердить смену</button>
+</div>
+</div>
 
-                <div class="space-y-3 relative z-10">
-                    <h4 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Документация кухни</h4>
-                    
-                    <button onclick="openActionModal('inventory')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
-                        <div class="text-left"><h4 class="font-serif text-lg text-gold font-bold">Инвентаризация</h4><p class="text-xs text-mutedtext mt-0.5 font-serif italic">Ввод фактических остатков сырья</p></div><span class="text-goldmuted">→</span>
-                    </button>
-                    <button onclick="openActionModal('writeoff')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
-                        <div class="text-left"><h4 class="font-serif text-lg text-[#D47070] font-bold">Списание / Порча</h4><p class="text-xs text-mutedtext mt-0.5 font-serif italic">Списание брака и продуктов</p></div><span class="text-[#D47070]">→</span>
-                    </button>
-                    <button onclick="openActionModal('prototype')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
-                        <div class="text-left"><h4 class="font-serif text-lg text-[#A88D4D] font-bold">Акт Проработки</h4><p class="text-xs text-mutedtext mt-0.5 font-serif italic">Лаборатория вкуса и расчет выхода</p></div><span class="text-[#A88D4D]">→</span>
-                    </button>
-                    <button onclick="openActionModal('dinner')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
-                        <div class="text-left"><h4 class="font-serif text-lg text-[#88B08A] font-bold">Питание Стаффа</h4><p class="text-xs text-mutedtext mt-0.5 font-serif italic">Обеды и ужины персонала</p></div><span class="text-[#88B08A]">→</span>
-                    </button>
-                </div>
-            </div>
-        </main>
+<div class="space-y-3 relative z-10">
+<h4 class="text-xs font-serif font-bold uppercase tracking-widest text-mutedtext pl-1">Документация кухни</h4>
 
-        <!-- Навигация -->
-        <nav class="fixed bottom-0 left-0 right-0 h-16 bg-card/95 backdrop-blur-md border-t border-bordercolor flex justify-around items-center z-40 px-2">
-            <button onclick="switchTab('home')" id="btn-home" class="flex flex-col items-center space-y-1 text-gold">
-                <span class="text-xl leading-none">⚜️</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Главная</span>
-            </button>
-            <button onclick="switchTab('ttk')" id="btn-ttk" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
-                <span class="text-xl leading-none">📖</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Меню</span>
-            </button>
-            <button onclick="switchTab('actions')" id="btn-actions" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
-                <span class="text-xl leading-none">⚖️</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Журналы</span>
-            </button>
-        </nav>
-    </div>
+<button onclick="openActionModal('inventory')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
+<div class="text-left"><h4 class="font-serif text-lg text-gold font-bold">Инвентаризация</h4><p class="text-xs text-mutedtext mt-0.5 font-serif italic">Ввод фактических остатков сырья</p></div><span class="text-goldmuted">→</span>
+</button>
+<button onclick="openActionModal('writeoff')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
+<div class="text-left"><h4 class="font-serif text-lg text-[#D47070] font-bold">Списание / Порча</h4><p class="text-xs text-mutedtext mt-0.5 font-serif italic">Списание брака и продуктов</p></div><span class="text-[#D47070]">→</span>
+</button>
+<button onclick="openActionModal('prototype')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
+<div class="text-left"><h4 class="font-serif text-lg text-[#A88D4D] font-bold">Акт Проработки</h4><p class="text-xs text-mutedtext mt-0.5 font-serif italic">Лаборатория вкуса и расчет выхода</p></div><span class="text-[#A88D4D]">→</span>
+</button>
+<button onclick="openActionModal('dinner')" class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-4 flex items-center justify-between active:scale-[0.99] transition">
+<div class="text-left"><h4 class="font-serif text-lg text-[#88B08A] font-bold">Питание Стаффа</h4><p class="text-xs text-mutedtext mt-0.5 font-serif italic">Обеды и ужины персонала</p></div><span class="text-[#88B08A]">→</span>
+</button>
+</div>
+</div>
+</main>
 
-    <!-- ========================================== -->
-    <!-- МОДАЛЬНЫЕ ОКНА И УВЕДОМЛЕНИЯ -->
-    <!-- ========================================== -->
+<nav class="fixed bottom-0 left-0 right-0 h-16 bg-card/95 backdrop-blur-md border-t border-bordercolor flex justify-around items-center z-40 px-2">
+<button onclick="switchTab('home')" id="btn-home" class="flex flex-col items-center space-y-1 text-gold">
+<span class="text-xl leading-none">⚜️</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Главная</span>
+</button>
+<button onclick="switchTab('ttk')" id="btn-ttk" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
+<span class="text-xl leading-none">📖</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Меню</span>
+</button>
+<button onclick="switchTab('actions')" id="btn-actions" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
+<span class="text-xl leading-none">⚖️</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Журналы</span>
+</button>
+</nav>
+</div>
 
-    <!-- Модалка ТТК -->
-    <div id="ttkModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeTtkModal()">
-        <div class="bg-card border-t border-gold rounded-t-2xl w-full max-w-md p-6 space-y-5 max-h-[85vh] overflow-y-auto elegant-shadow" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-start border-b border-bordercolor pb-4">
-                <div>
-                    <span id="modalRecipeCategory" class="text-[10px] font-bold uppercase tracking-widest text-goldmuted">Кухня</span>
-                    <h3 id="modalRecipeName" class="text-2xl font-serif font-bold text-lighttext mt-1">Название Блюда</h3>
-                    <p id="modalRecipeOutput" class="text-sm text-mutedtext mt-1 font-serif italic">Выход: —</p>
-                </div>
-                <button onclick="closeTtkModal()" class="text-mutedtext hover:text-lighttext text-2xl p-1 leading-none">&times;</button>
-            </div>
-            
-            <div id="modalRecipeDescriptionBlock" class="hidden bg-dark/40 border border-bordercolor/40 rounded-xl p-4 space-y-1.5">
-                <span class="text-[9px] font-bold uppercase tracking-widest text-goldmuted">⚜️ Способ приготовления</span>
-                <p id="modalRecipeDescription" class="font-serif italic leading-relaxed text-mutedtext transition-all duration-300"></p>
-            </div>
+<!-- Модалка ТТК -->
+<div id="ttkModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeTtkModal()">
+<div class="bg-card border-t border-gold rounded-t-2xl w-full max-w-md p-6 space-y-5 max-h-[85vh] overflow-y-auto elegant-shadow" onclick="event.stopPropagation()">
+<div class="flex justify-between items-start border-b border-bordercolor pb-4">
+<div>
+<span id="modalRecipeCategory" class="text-[10px] font-bold uppercase tracking-widest text-goldmuted">Кухня</span>
+<h3 id="modalRecipeName" class="text-2xl font-serif font-bold text-lighttext mt-1">Название Блюда</h3>
+<p id="modalRecipeOutput" class="text-sm text-mutedtext mt-1 font-serif italic">Выход: —</p>
+</div>
+<button onclick="closeTtkModal()" class="text-mutedtext hover:text-lighttext text-2xl p-1 leading-none">&times;</button>
+</div>
+<div id="modalRecipeDescriptionBlock" class="hidden bg-dark/40 border border-bordercolor/40 rounded-xl p-4 space-y-1.5">
+<span class="text-[9px] font-bold uppercase tracking-widest text-goldmuted">⚜️ Способ приготовления</span>
+<p id="modalRecipeDescription" class="font-serif italic leading-relaxed text-mutedtext transition-all duration-300"></p>
+</div>
+<div class="space-y-2">
+<label class="text-xs text-mutedtext font-serif italic">Множитель порций:</label>
+<input type="number" id="ttkMultiplier" value="1" min="0" step="0.5" oninput="recalcTtk(this.value)" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-lighttext font-mono font-bold focus:outline-none">
+</div>
+<table class="w-full text-left text-sm mt-2">
+<thead>
+<tr class="text-[10px] uppercase text-mutedtext border-b border-bordercolor font-serif tracking-widest">
+<th class="pb-2 font-bold">Ингредиент</th>
+<th class="pb-2 text-center font-bold">Ед</th>
+<th class="pb-2 text-right font-bold">Вес</th>
+</tr>
+</thead>
+<tbody id="modalTtkBody" class="divide-y divide-bordercolor"></tbody>
+</table>
+</div>
+</div>
 
-            <div class="space-y-2">
-                <label class="text-xs text-mutedtext font-serif italic">Множитель порций:</label>
-                <input type="number" id="ttkMultiplier" value="1" min="0" step="0.5" oninput="recalcTtk(this.value)" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-lighttext font-mono font-bold focus:outline-none">
-            </div>
-            <table class="w-full text-left text-sm mt-2">
-                <thead>
-                    <tr class="text-[10px] uppercase text-mutedtext border-b border-bordercolor font-serif tracking-widest">
-                        <th class="pb-2 font-bold">Ингредиент</th>
-                        <th class="pb-2 text-center font-bold">Ед</th>
-                        <th class="pb-2 text-right font-bold">Вес</th>
-                    </tr>
-                </thead>
-                <tbody id="modalTtkBody" class="divide-y divide-bordercolor"></tbody>
-            </table>
-        </div>
-    </div>
+<!-- Модалка Действий (Инвентаризация / Списание / Проработка) -->
+<div id="actionModal" class="fixed inset-0 bg-dark z-50 flex flex-col hidden">
+<header class="px-4 py-4 border-b border-bordercolor flex justify-between items-center bg-card">
+<h3 id="actionModalTitle" class="font-serif font-bold text-gold text-lg tracking-wide uppercase">Действие</h3>
+<button onclick="closeActionModal()" class="text-mutedtext p-1 text-sm font-serif italic">Отмена</button>
+</header>
 
-    <!-- Модалка Действий (Универсальная) -->
-    <div id="actionModal" class="fixed inset-0 bg-dark z-50 flex flex-col hidden">
-        <header class="px-4 py-4 border-b border-bordercolor flex justify-between items-center bg-card">
-            <h3 id="actionModalTitle" class="font-serif font-bold text-gold text-lg tracking-wide uppercase">Действие</h3>
-            <button onclick="closeActionModal()" class="text-mutedtext p-1 text-sm font-serif italic">Отмена</button>
-        </header>
-        
-        <div class="p-4 bg-card border-b border-bordercolor hidden" id="prototypeMetaRow">
-            <input type="text" id="prototypeTitleInput" placeholder="Название блюда / полуфабриката" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif mb-3">
-            <input type="number" id="prototypeOutputInput" step="0.001" placeholder="Итоговый выход (кг/л)" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-gold focus:outline-none font-serif font-bold">
-        </div>
+<div class="p-4 bg-card border-b border-bordercolor hidden" id="prototypeMetaRow">
+<input type="text" id="prototypeTitleInput" placeholder="Название блюда / полуфабриката" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif mb-3">
+<input type="number" id="prototypeOutputInput" step="0.001" placeholder="Итоговый выход (кг/л)" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-gold focus:outline-none font-serif font-bold">
+</div>
 
-        <div class="p-4 bg-card border-b border-bordercolor hidden" id="actionMetaRow">
-            <select id="actionReasonSelect" onchange="toggleIndividualInput()" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif">
-                <option value="Порча">Порча</option>
-                <option value="Проработка (старая)">Проработка (списание)</option>
-                <option value="Индивидуальное списание">Индивидуальное списание (на повара)</option>
-            </select>
-            <input type="text" id="actionStaffNameInput" placeholder="Фамилия сотрудника" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none mt-3 hidden font-serif italic">
-        </div>
-        <div class="p-4 bg-card border-b border-bordercolor hidden" id="dinnerMetaRow">
-            <select id="dinnerTypeSelect" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif">
-                <option value="Обед стаффа">Обед персонала</option><option value="Ужин стаффа">Ужин персонала</option>
-            </select>
-        </div>
-        <div class="p-4 bg-card sticky top-0 z-10 border-b border-bordercolor">
-            <input type="text" id="actionSearch" oninput="filterActionItems()" placeholder="Поиск продукта по 1С..." class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-2.5 text-sm text-lighttext focus:outline-none font-serif italic">
-        </div>
-        <div class="flex-1 overflow-y-auto px-4 pb-24" id="actionItemsList"></div>
-        <div class="fixed bottom-0 left-0 right-0 p-4 bg-card/95 backdrop-blur border-t border-bordercolor flex gap-3">
-            <button onclick="submitActionData()" class="flex-1 bg-gradient-to-r from-goldmuted to-gold text-dark font-serif font-bold text-lg tracking-widest uppercase py-3.5 rounded-lg active:scale-[0.98] transition elegant-shadow">Отправить Акт</button>
-        </div>
-    </div>
+<div class="p-4 bg-card border-b border-bordercolor hidden" id="actionMetaRow">
+<select id="actionReasonSelect" onchange="toggleIndividualInput()" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif">
+<option value="Порча">Порча</option>
+<option value="Проработка (старая)">Проработка (списание)</option>
+<option value="Индивидуальное списание">Индивидуальное списание (на повара)</option>
+</select>
+<input type="text" id="actionStaffNameInput" placeholder="Фамилия сотрудника" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none mt-3 hidden font-serif italic">
+</div>
 
-    <!-- Модалка Календарного События -->
-    <div id="calendarEventModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-center justify-center hidden" onclick="closeCalendarEvent()">
-        <div class="bg-card border border-gold rounded-2xl w-full max-w-[85vw] p-6 elegant-shadow relative text-center" onclick="event.stopPropagation()">
-            <button onclick="closeCalendarEvent()" class="absolute top-3 right-4 text-mutedtext text-2xl hover:text-lighttext transition">&times;</button>
-            <span class="text-3xl block mb-2">🗓</span>
-            <h3 id="eventModalDay" class="font-serif font-bold text-gold text-sm tracking-widest uppercase mb-3">15 число</h3>
-            <p id="eventModalText" class="text-lighttext font-serif italic leading-relaxed text-lg"></p>
-        </div>
-    </div>
+<div class="p-4 bg-card border-b border-bordercolor hidden" id="dinnerMetaRow">
+<select id="dinnerTypeSelect" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif">
+<option value="Обед стаффа">Обед персонала</option><option value="Ужин стаффа">Ужин персонала</option>
+</select>
+</div>
 
-    <!-- НОЧНОЕ НАПОМИНАНИЕ (23:00) -->
-    <div id="nightModal" class="fixed inset-0 bg-dark/95 backdrop-blur-md z-[60] flex items-center justify-center hidden">
-        <div class="bg-card border border-bordercolor rounded-2xl w-full max-w-[85vw] p-8 text-center elegant-shadow relative">
-            <span class="text-5xl block mb-4 animate-pulse">🌙</span>
-            <h3 class="font-serif font-bold text-gold text-2xl tracking-wide mb-2">Конец смены</h3>
-            <p class="text-mutedtext font-serif italic leading-relaxed text-sm mb-6">Время подводить итоги. Пожалуйста, не забудьте внести все списания, порчу и питание стаффа.</p>
-            <div class="space-y-3">
-                <button onclick="goToWriteoffs()" class="w-full bg-gradient-to-r from-goldmuted to-gold text-dark font-serif font-bold text-sm tracking-widest uppercase py-3 rounded-lg active:scale-95 transition shadow-[0_0_15px_rgba(212,175,55,0.2)]">Внести списания</button>
-                <button onclick="closeNightModal()" class="w-full bg-transparent border border-bordercolor text-mutedtext font-serif text-sm tracking-widest uppercase py-3 rounded-lg active:scale-95 transition">Закрыть</button>
-            </div>
-        </div>
-    </div>
+<div class="p-4 bg-card sticky top-0 z-10 border-b border-bordercolor">
+<input type="text" id="actionSearch" oninput="filterActionItems()" placeholder="Поиск продукта по 1С..." class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-2.5 text-sm text-lighttext focus:outline-none font-serif italic">
+</div>
 
-    <!-- СКРИПТЫ -->
-    <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec"; 
-        let appData = { schedule: [], position: "Повар", rate: 0, role: "Повар", recipes: [], items1c: [], info: [], fines: [], allUsers: [], events: [] };
-        let currentUser = null; let currentTab = 'home'; let selectedCategory = 'Все'; let activeModalRecipe = null; let activeActionType = 'inventory'; 
+<!-- ВАЖНО: flex-col позволяет нам поднимать выбранные элементы наверх с помощью order -->
+<div class="flex-1 overflow-y-auto px-4 pb-24 flex flex-col" id="actionItemsList"></div>
 
-        // ТАКТИЛЬНАЯ ОТДАЧА (Только для ошибок и успешной отправки актов)
-        function vibe(ms = 30) {
-            if ("vibrate" in navigator) { navigator.vibrate(ms); }
-        }
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-card/95 backdrop-blur border-t border-bordercolor flex gap-3">
+<button onclick="submitActionData()" class="flex-1 bg-gradient-to-r from-goldmuted to-gold text-dark font-serif font-bold text-lg tracking-widest uppercase py-3.5 rounded-lg active:scale-[0.98] transition elegant-shadow">Отправить Акт</button>
+</div>
+</div>
 
-        window.onload = () => {
-            const savedUser = localStorage.getItem('kitchen_user');
-            if (savedUser) { currentUser = JSON.parse(savedUser); showApp(); }
-            startNightWatcher(); 
-        };
+<!-- Модалка Календарного События -->
+<div id="calendarEventModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-center justify-center hidden" onclick="closeCalendarEvent()">
+<div class="bg-card border border-gold rounded-2xl w-full max-w-[85vw] p-6 elegant-shadow relative text-center" onclick="event.stopPropagation()">
+<button onclick="closeCalendarEvent()" class="absolute top-3 right-4 text-mutedtext text-2xl hover:text-lighttext transition">&times;</button>
+<span class="text-3xl block mb-2">🗓</span>
+<h3 id="eventModalDay" class="font-serif font-bold text-gold text-sm tracking-widest uppercase mb-3">15 число</h3>
+<p id="eventModalText" class="text-lighttext font-serif italic leading-relaxed text-lg"></p>
+</div>
+</div>
 
-        function showToast(message) {
-            let toast = document.getElementById('customToast');
-            document.getElementById('toastMessage').innerText = message;
-            toast.classList.remove('-translate-y-32', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('-translate-y-32', 'opacity-0');
-            }, 3500);
-        }
+<!-- НОЧНОЕ НАПОМИНАНИЕ (23:00) -->
+<div id="nightModal" class="fixed inset-0 bg-dark/95 backdrop-blur-md z-[60] flex items-center justify-center hidden">
+<div class="bg-card border border-bordercolor rounded-2xl w-full max-w-[85vw] p-8 text-center elegant-shadow relative">
+<span class="text-5xl block mb-4 animate-pulse">🌙</span>
+<h3 class="font-serif font-bold text-gold text-2xl tracking-wide mb-2">Конец смены</h3>
+<p class="text-mutedtext font-serif italic leading-relaxed text-sm mb-6">Время подводить итоги. Пожалуйста, не забудьте внести все списания, порчу и питание стаффа.</p>
+<div class="space-y-3">
+<button onclick="goToWriteoffs()" class="w-full bg-gradient-to-r from-goldmuted to-gold text-dark font-serif font-bold text-sm tracking-widest uppercase py-3 rounded-lg active:scale-95 transition shadow-[0_0_15px_rgba(212,175,55,0.2)]">Внести списания</button>
+<button onclick="closeNightModal()" class="w-full bg-transparent border border-bordercolor text-mutedtext font-serif text-sm tracking-widest uppercase py-3 rounded-lg active:scale-95 transition">Закрыть</button>
+</div>
+</div>
+</div>
 
-        function checkNightTime() {
-            let now = new Date();
-            if (now.getHours() >= 23 && !sessionStorage.getItem('nightAlertDone')) {
-                sessionStorage.setItem('nightAlertDone', 'true');
-                document.getElementById('nightModal').classList.remove('hidden');
-            }
-        }
-        function startNightWatcher() { setInterval(checkNightTime, 60000); }
-        
-        function closeNightModal() { document.getElementById('nightModal').classList.add('hidden'); }
-        function goToWriteoffs() {
-            document.getElementById('nightModal').classList.add('hidden');
-            switchTab('actions');
-        }
+<!-- СКРИПТЫ -->
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec";
+let appData = { schedule: [], position: "Повар", rate: 0, role: "Повар", recipes: [], items1c: [], info: [], fines: [], allUsers: [], events: [] };
+let currentUser = null; let currentTab = 'home'; let selectedCategory = 'Все'; let activeModalRecipe = null; let activeActionType = 'inventory';
 
-        function handleLogin() {
-            let log = document.getElementById('loginInput').value.trim();
-            let pas = document.getElementById('passInput').value.trim();
-            if(!log || !pas) return;
-            document.getElementById('authError').classList.add('hidden');
-            let btn = document.getElementById('loginBtn');
-            let originalText = btn.innerText;
-            btn.innerText = "ПРОВЕРКА...";
-            btn.disabled = true;
-            
-            fetch(`${WEB_APP_URL}?action=login&login=${encodeURIComponent(log)}&password=${encodeURIComponent(pas)}`)
-                .then(res => res.json())
-                .then(data => {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                    if(data.status === "success") {
-                        currentUser = { name: data.user.name, role: data.user.role };
-                        localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
-                        showApp();
-                    } else {
-                        vibe([50, 50, 50]); // Ошибка: тройная вибрация
-                        document.getElementById('authError').classList.remove('hidden');
-                    }
-                }).catch(err => {
-                    btn.innerText = originalText; btn.disabled = false; showToast("Ошибка связи");
-                });
-        }
+// ТАКТИЛЬНАЯ ОТДАЧА (Только для ошибок и успешной отправки актов)
+function vibe(ms = 30) {
+if ("vibrate" in navigator) { navigator.vibrate(ms); }
+}
 
-        function handleLogout() { localStorage.removeItem('kitchen_user'); location.reload(); }
+window.onload = () => {
+const savedUser = localStorage.getItem('kitchen_user');
+if (savedUser) { currentUser = JSON.parse(savedUser); showApp(); }
+startNightWatcher();
+};
 
-        function showApp() {
-            document.getElementById('authScreen').classList.add('hidden');
-            document.getElementById('appContainer').classList.remove('hidden');
-            document.getElementById('appContainer').classList.add('flex');
-            loadAppData();
-            setTimeout(checkNightTime, 2000); 
-        }
+function showToast(message) {
+let toast = document.getElementById('customToast');
+document.getElementById('toastMessage').innerText = message;
+toast.classList.remove('-translate-y-32', 'opacity-0');
+toast.classList.add('translate-y-0', 'opacity-100');
+setTimeout(() => {
+toast.classList.remove('translate-y-0', 'opacity-100');
+toast.classList.add('-translate-y-32', 'opacity-0');
+}, 3500);
+}
 
-        function loadAppData() {
-            if(!currentUser) return;
-            document.getElementById('userNameText').innerText = currentUser.name;
-            document.getElementById('userInitial').innerText = currentUser.name.charAt(0).toUpperCase();
-            
-            let cacheBuster = new Date().getTime();
-            fetch(`${WEB_APP_URL}?action=getAppData&userName=${encodeURIComponent(currentUser.name)}&t=${cacheBuster}`)
-                .then(res => res.json()).then(data => {
-                    if(data.status === "success") { 
-                        appData = data; 
-                        currentUser.role = data.role;
-                        localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
-                        renderHome(); 
-                        renderTtkCategories(); 
-                        renderTtkList(); 
-                        checkAdminStatus();
-                    }
-                }).catch(err => console.log("Ошибка сети:", err));
-        }
+function checkNightTime() {
+let now = new Date();
+if (now.getHours() >= 23 && !sessionStorage.getItem('nightAlertDone')) {
+sessionStorage.setItem('nightAlertDone', 'true');
+document.getElementById('nightModal').classList.remove('hidden');
+}
+}
+function startNightWatcher() { setInterval(checkNightTime, 60000); }
 
-        function checkAdminStatus() {
-            let role = appData.role ? appData.role.toLowerCase().trim() : "повар";
-            let adminRoles = ["шеф-повар", "шеф", "су-шеф", "директор"];
-            if(adminRoles.includes(role)) {
-                document.getElementById('adminPanelBlock').classList.remove('hidden');
-                renderAdminSelects();
-            } else { document.getElementById('adminPanelBlock').classList.add('hidden'); }
-        }
+function closeNightModal() { document.getElementById('nightModal').classList.add('hidden'); }
+function goToWriteoffs() {
+document.getElementById('nightModal').classList.add('hidden');
+switchTab('actions');
+}
 
-        function renderAdminSelects() {
-            document.getElementById('adminWorkerSelect').innerHTML = appData.allUsers.map(u => `<option value="${u}">${u}</option>`).join('');
-            let today = new Date().getDate();
-            document.getElementById('adminDaySelect').innerHTML = Array.from({length: 31}, (_, i) => i + 1)
-                .map(d => `<option value="${d}" ${d === today ? 'selected' : ''}>${d} число</option>`).join('');
-        }
+function handleLogin() {
+let log = document.getElementById('loginInput').value.trim();
+let pas = document.getElementById('passInput').value.trim();
+if(!log || !pas) return;
+document.getElementById('authError').classList.add('hidden');
+let btn = document.getElementById('loginBtn');
+let originalText = btn.innerText;
+btn.innerText = "ПРОВЕРКА...";
+btn.disabled = true;
 
-        function submitShiftConfirmation() {
-            let employee = document.getElementById('adminWorkerSelect').value;
-            let day = document.getElementById('adminDaySelect').value;
-            let val = document.getElementById('adminShiftSelect').value;
-            if(!employee || !day || !val) return;
-            fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "confirmShift", employeeName: employee, day: day, shiftValue: val }) });
-            showToast(`Смена утверждена`);
-            loadAppData(); 
-        }
+fetch(`${WEB_APP_URL}?action=login&login=${encodeURIComponent(log)}&password=${encodeURIComponent(pas)}`)
+.then(res => res.json())
+.then(data => {
+btn.innerText = originalText;
+btn.disabled = false;
+if(data.status === "success") {
+currentUser = { name: data.user.name, role: data.user.role };
+localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
+showApp();
+} else {
+vibe([50, 50, 50]); // Ошибка: тройная вибрация
+document.getElementById('authError').classList.remove('hidden');
+}
+}).catch(err => {
+btn.innerText = originalText; btn.disabled = false; showToast("Ошибка связи");
+});
+}
 
-        function switchTab(tab) {
-            currentTab = tab;
-            ['home', 'ttk', 'actions'].forEach(t => {
-                document.getElementById(`section-${t}`).classList.add('hidden');
-                document.getElementById(`btn-${t}`).className = "flex flex-col items-center space-y-1 text-mutedtext opacity-60 transition";
-            });
-            document.getElementById(`section-${tab}`).classList.remove('hidden');
-            document.getElementById(`btn-${tab}`).className = "flex flex-col items-center space-y-1 text-gold scale-110 transition";
-        }
+function handleLogout() { localStorage.removeItem('kitchen_user'); location.reload(); }
 
-        function renderHome() {
-            document.getElementById('userRoleText').innerText = appData.role;
-            document.getElementById('userRateText').innerText = `Ставка: ${appData.rate} ₽`;
-            
-            let currentDay = new Date().getDate();
-            let totalShifts = 0;
-            appData.schedule.forEach(s => {
-                if(s.day <= currentDay) {
-                    let shiftNum = parseFloat(s.shift.toString().replace(',', '.'));
-                    if(!isNaN(shiftNum)) { totalShifts += shiftNum; }
-                }
-            });
-            
-            let baseEarnings = totalShifts * appData.rate;
-            let totalFines = 0; let totalBonuses = 0;
-            appData.fines.forEach(f => {
-                if(f.type.toLowerCase() === 'штраф') totalFines += f.volume;
-                if(f.type.toLowerCase() === 'бонус') totalBonuses += f.volume;
-            });
-            let netEarnings = baseEarnings + totalBonuses - totalFines;
+function showApp() {
+document.getElementById('authScreen').classList.add('hidden');
+document.getElementById('appContainer').classList.remove('hidden');
+document.getElementById('appContainer').classList.add('flex');
+loadAppData();
+setTimeout(checkNightTime, 2000);
+}
 
-            document.getElementById('statsTotalShifts').innerText = totalShifts;
-            document.getElementById('statsNetEarnings').innerText = `${netEarnings.toLocaleString('ru-RU')} ₽`;
+function loadAppData() {
+if(!currentUser) return;
+document.getElementById('userNameText').innerText = currentUser.name;
+document.getElementById('userInitial').innerText = currentUser.name.charAt(0).toUpperCase();
 
-            if(appData.info && appData.info.length > 0) {
-                document.getElementById('infoBlock').classList.remove('hidden');
-                document.getElementById('infoTitle').innerText = `⚜️ ${appData.info[0].title}`;
-                document.getElementById('infoText').innerText = appData.info[0].text;
-            }
-            
-            let grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
-            for(let d = 1; d <= 31; d++) {
-                let shift = appData.schedule.find(s => s.day === d);
-                let ev = appData.events ? appData.events.find(e => e.day === d) : null;
-                let isWork = shift && shift.shift !== "" && shift.shift.toLowerCase() !== "о" && shift.shift.toLowerCase() !== "х";
-                let isPast = d <= currentDay;
-                
-                let baseClasses = "aspect-square flex flex-col items-center justify-center rounded-lg border p-1 min-w-[40px] relative transition-all duration-300";
-                let stateClasses = isWork ? (isPast ? 'bg-gold/20 text-gold border-gold' : 'bg-dark border-bordercolor text-lighttext font-bold') : 'bg-dark border-bordercolor/50 text-mutedtext';
-                
-                let eventClasses = ev ? "ring-1 ring-gold shadow-[0_0_8px_rgba(212,175,55,0.4)] cursor-pointer active:scale-95" : "";
-                let clickHandler = ev ? `onclick="openCalendarEvent(${d}, \`${ev.text.replace(/`/g, "'")}\`)"` : "";
-                
-                let cellHtml = `<div class="${baseClasses} ${stateClasses} ${eventClasses}" ${clickHandler}>
-                    <span class="text-[10px] opacity-60 font-serif">${d}</span>
-                    <span class="text-xs font-black mt-0.5">${shift ? shift.shift : '-'}</span>`;
-                    
-                if(ev) {
-                    cellHtml += `<div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-gold rounded-full border border-dark animate-pulse"></div>`;
-                }
-                
-                cellHtml += `</div>`;
-                grid.innerHTML += cellHtml;
-            }
-            
-            let fList = document.getElementById('finesList'); fList.innerHTML = '';
-            if(appData.fines.length === 0) { fList.innerHTML = `<p class="text-xs text-mutedtext py-2 font-serif italic">Нарушений и бонусов не обнаружено.</p>`; } 
-            else {
-                appData.fines.forEach(f => {
-                    let isBonus = f.type.toLowerCase() === 'бонус';
-                    fList.innerHTML += `<div class="bg-card border border-bordercolor p-3 rounded-xl flex justify-between items-center elegant-shadow"><div><p class="text-sm font-medium text-lighttext font-serif">${f.reason}</p><p class="text-[10px] text-mutedtext mt-0.5">${f.date}</p></div><span class="text-sm font-mono font-bold ${isBonus ? 'text-[#88B08A]' : 'text-[#D47070]'}">${isBonus ? '+' : '-'}${f.volume} ₽</span></div>`;
-                });
-            }
-        }
+let cacheBuster = new Date().getTime();
+fetch(`${WEB_APP_URL}?action=getAppData&userName=${encodeURIComponent(currentUser.name)}&t=${cacheBuster}`)
+.then(res => res.json()).then(data => {
+if(data.status === "success") {
+appData = data;
+currentUser.role = data.role;
+localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
+renderHome();
+renderTtkCategories();
+renderTtkList();
+checkAdminStatus();
+}
+}).catch(err => console.log("Ошибка сети:", err));
+}
 
-        function openCalendarEvent(day, text) {
-            document.getElementById('eventModalDay').innerText = `${day} число`;
-            document.getElementById('eventModalText').innerText = text;
-            document.getElementById('calendarEventModal').classList.remove('hidden');
-        }
-        function closeCalendarEvent() {
-            document.getElementById('calendarEventModal').classList.add('hidden');
-        }
+function checkAdminStatus() {
+let role = appData.role ? appData.role.toLowerCase().trim() : "повар";
+let adminRoles = ["шеф-повар", "шеф", "су-шеф", "директор"];
+if(adminRoles.includes(role)) {
+document.getElementById('adminPanelBlock').classList.remove('hidden');
+renderAdminSelects();
+} else { document.getElementById('adminPanelBlock').classList.add('hidden'); }
+}
 
-        function renderTtkCategories() {
-            let bar = document.getElementById('categoriesBar');
-            let cats = ['Все', ...new Set(appData.recipes.map(r => r.category))];
-            bar.innerHTML = cats.map(c => `<button onclick="selectCategory('${c}')" class="px-5 py-1.5 text-xs rounded-full whitespace-nowrap border font-serif tracking-widest uppercase transition ${selectedCategory === c ? 'bg-gold text-dark border-gold font-bold' : 'bg-card border-bordercolor text-mutedtext'}">${c}</button>`).join('');
-        }
-        function selectCategory(cat) { selectedCategory = cat; renderTtkCategories(); filterTtk(); }
+function renderAdminSelects() {
+document.getElementById('adminWorkerSelect').innerHTML = appData.allUsers.map(u => `<option value="${u}">${u}</option>`).join('');
+let today = new Date().getDate();
+document.getElementById('adminDaySelect').innerHTML = Array.from({length: 31}, (_, i) => i + 1)
+.map(d => `<option value="${d}" ${d === today ? 'selected' : ''}>${d} число</option>`).join('');
+}
 
-        function renderTtkList() {
-            let container = document.getElementById('ttkList');
-            let filtered = appData.recipes.filter(r => selectedCategory === 'Все' || r.category === selectedCategory);
-            container.innerHTML = filtered.map(r => `<div onclick="openTtkModal('${r.name}')" class="bg-card border border-bordercolor p-4 rounded-xl flex flex-col justify-between h-28 elegant-shadow cursor-pointer active:scale-95 transition"><div><span class="text-[9px] font-bold text-goldmuted uppercase tracking-widest">${r.category}</span><h4 class="font-bold font-serif text-lg text-lighttext mt-1 leading-tight line-clamp-2">${r.name}</h4></div><p class="text-[11px] text-mutedtext font-serif italic">Выход: ${r.ingredients[0]?.output || '—'}</p></div>`).join('');
-        }
+function submitShiftConfirmation() {
+let employee = document.getElementById('adminWorkerSelect').value;
+let day = document.getElementById('adminDaySelect').value;
+let val = document.getElementById('adminShiftSelect').value;
+if(!employee || !day || !val) return;
+fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "confirmShift", employeeName: employee, day: day, shiftValue: val }) });
+showToast(`Смена утверждена`);
+loadAppData();
+}
 
-        function filterTtk() {
-            let query = document.getElementById('searchTtk').value.toLowerCase().trim();
-            let cards = document.getElementById('ttkList').children;
-            appData.recipes.filter(r => selectedCategory === 'Все' || r.category === selectedCategory).forEach((r, idx) => {
-                if(cards[idx]) { cards[idx].style.display = (r.name.toLowerCase().includes(query) || r.ingredients.some(i => i.name.toLowerCase().includes(query))) ? 'flex' : 'none'; }
-            });
-        }
+function switchTab(tab) {
+currentTab = tab;
+['home', 'ttk', 'actions'].forEach(t => {
+document.getElementById(`section-${t}`).classList.add('hidden');
+document.getElementById(`btn-${t}`).className = "flex flex-col items-center space-y-1 text-mutedtext opacity-60 transition";
+});
+document.getElementById(`section-${tab}`).classList.remove('hidden');
+document.getElementById(`btn-${tab}`).className = "flex flex-col items-center space-y-1 text-gold scale-110 transition";
+}
 
-        function openTtkModal(name) {
-            let r = appData.recipes.find(rec => rec.name === name); if(!r) return; activeModalRecipe = r;
-            document.getElementById('modalRecipeCategory').innerText = r.category;
-            document.getElementById('modalRecipeName').innerText = r.name;
-            document.getElementById('modalRecipeOutput').innerText = `Выход: ${r.ingredients[0]?.output || '—'}`;
-            let descBlock = document.getElementById('modalRecipeDescriptionBlock');
-            let descText = document.getElementById('modalRecipeDescription');
-            if(r.description && r.description.trim() !== "") {
-                descText.innerText = r.description;
-                let textLen = r.description.length;
-                if(textLen > 250) { descText.className = "font-serif italic leading-relaxed text-mutedtext text-[11px] sm:text-xs"; } 
-                else if(textLen > 100) { descText.className = "font-serif italic leading-relaxed text-mutedtext text-xs sm:text-sm"; } 
-                else { descText.className = "font-serif italic leading-relaxed text-goldmuted text-sm sm:text-base"; }
-                descBlock.classList.remove('hidden');
-            } else { descBlock.classList.add('hidden'); }
-            document.getElementById('ttkMultiplier').value = 1; recalcTtk(1);
-            document.getElementById('ttkModal').classList.remove('hidden');
-        }
+function renderHome() {
+document.getElementById('userRoleText').innerText = appData.role;
+document.getElementById('userRateText').innerText = `Ставка: ${appData.rate} ₽`;
 
-        function recalcTtk(mStr) {
-            if(!activeModalRecipe) return; let m = parseFloat(mStr) || 0; if(m < 0) m = 0;
-            document.getElementById('modalTtkBody').innerHTML = activeModalRecipe.ingredients.map(i => `
-                <tr class="border-b border-bordercolor">
-                    <td class="py-3 font-serif text-lighttext text-sm">${i.name}</td>
-                    <td class="py-3 text-center text-mutedtext uppercase text-[10px] tracking-widest">${i.unit}</td>
-                    <td class="py-3 text-right font-mono text-gold font-bold text-sm">${(i.brutto * m).toFixed(3).replace(/\.000$/, '')}</td>
-                </tr>`).join('');
-        }
-        function closeTtkModal() { document.getElementById('ttkModal').classList.add('hidden'); }
+let currentDay = new Date().getDate();
+let totalShifts = 0;
+appData.schedule.forEach(s => {
+if(s.day <= currentDay) {
+let shiftNum = parseFloat(s.shift.toString().replace(',', '.'));
+if(!isNaN(shiftNum)) { totalShifts += shiftNum; }
+}
+});
 
-        function toggleIndividualInput() {
-            let select = document.getElementById('actionReasonSelect');
-            let input = document.getElementById('actionStaffNameInput');
-            if(select.value === 'Индивидуальное списание') { input.classList.remove('hidden'); } else { input.classList.add('hidden'); }
-        }
+let baseEarnings = totalShifts * appData.rate;
+let totalFines = 0; let totalBonuses = 0;
+appData.fines.forEach(f => {
+if(f.type.toLowerCase() === 'штраф') totalFines += f.volume;
+if(f.type.toLowerCase() === 'бонус') totalBonuses += f.volume;
+});
+let netEarnings = baseEarnings + totalBonuses - totalFines;
 
-        function openActionModal(type) {
-            activeActionType = type; document.getElementById('actionModal').classList.remove('hidden'); document.getElementById('actionSearch').value = '';
-            document.getElementById('actionMetaRow').classList.add('hidden');
-            document.getElementById('dinnerMetaRow').classList.add('hidden');
-            document.getElementById('prototypeMetaRow').classList.add('hidden');
-            document.getElementById('actionStaffNameInput').classList.add('hidden');
-            document.getElementById('actionStaffNameInput').value = '';
-            document.getElementById('prototypeTitleInput').value = '';
-            document.getElementById('prototypeOutputInput').value = '';
-            document.getElementById('actionReasonSelect').value = 'Порча';
-            let title = "Инвентаризация"; 
-            if(type === 'writeoff') { title = "Журнал: Брак и Порча"; document.getElementById('actionMetaRow').classList.remove('hidden'); }
-            else if(type === 'dinner') { title = "Журнал: Питание Стаффа"; document.getElementById('dinnerMetaRow').classList.remove('hidden'); }
-            else if(type === 'prototype') { title = "Лаборатория: Проработка"; document.getElementById('prototypeMetaRow').classList.remove('hidden'); }
-            document.getElementById('actionModalTitle').innerText = title; renderActionItems();
-        }
+document.getElementById('statsTotalShifts').innerText = totalShifts;
+document.getElementById('statsNetEarnings').innerText = `${netEarnings.toLocaleString('ru-RU')} ₽`;
 
-        function renderActionItems() {
-            document.getElementById('actionItemsList').innerHTML = appData.items1c.map((item, idx) => `
-                <div class="action-item-row py-3 border-b border-bordercolor flex justify-between items-center gap-4" data-name="${item.name.toLowerCase()}">
-                    <div class="flex-1"><p class="text-sm font-medium text-lighttext font-serif">${item.name}</p><p class="text-[10px] text-mutedtext uppercase mt-0.5 tracking-widest">${item.unit}</p></div>
-                    <input type="number" step="0.001" placeholder="0.0" class="action-val-input w-24 bg-dark border border-bordercolor rounded-lg px-2 py-2 text-right text-gold font-mono text-sm focus:outline-none focus:border-gold" data-idx="${idx}">
-                </div>`).join('');
-        }
+if(appData.info && appData.info.length > 0) {
+document.getElementById('infoBlock').classList.remove('hidden');
+document.getElementById('infoTitle').innerText = `⚜️ ${appData.info[0].title}`;
+document.getElementById('infoText').innerText = appData.info[0].text;
+}
 
-        function filterActionItems() {
-            let query = document.getElementById('actionSearch').value.toLowerCase().trim();
-            Array.from(document.getElementById('actionItemsList').getElementsByClassName('action-item-row')).forEach(row => {
-                let inputField = row.querySelector('.action-val-input');
-                let val = parseFloat(inputField.value) || 0;
-                if (row.getAttribute('data-name').includes(query) || val > 0) { row.style.display = 'flex'; } else { row.style.display = 'none'; }
-            });
-        }
-        function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
+let grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+for(let d = 1; d <= 31; d++) {
+let shift = appData.schedule.find(s => s.day === d);
+let ev = appData.events ? appData.events.find(e => e.day === d) : null;
+let isWork = shift && shift.shift !== "" && shift.shift.toLowerCase() !== "о" && shift.shift.toLowerCase() !== "х";
+let isPast = d <= currentDay;
 
-        function submitActionData() {
-            let inputs = document.getElementById('actionItemsList').getElementsByClassName('action-val-input');
-            let payload = { action: activeActionType, userName: currentUser.name, items: [] };
+let baseClasses = "aspect-square flex flex-col items-center justify-center rounded-lg border p-1 min-w-[40px] relative transition-all duration-300";
+let stateClasses = isWork ? (isPast ? 'bg-gold/20 text-gold border-gold' : 'bg-dark border-bordercolor text-lighttext font-bold') : 'bg-dark border-bordercolor/50 text-mutedtext';
 
-            if (activeActionType === 'writeoff') {
-                let reasonVal = document.getElementById('actionReasonSelect').value;
-                if(reasonVal === 'Индивидуальное списание') {
-                    let staffName = document.getElementById('actionStaffNameInput').value.trim();
-                    if(!staffName) { showToast("Укажите фамилию сотрудника!"); vibe([50,50,50]); return; }
-                    reasonVal = `Индивидуальное списание (${staffName})`;
-                }
-                payload.reason = reasonVal;
-            } else if (activeActionType === 'dinner') {
-                payload.title = document.getElementById('dinnerTypeSelect').value;
-            } else if (activeActionType === 'prototype') {
-                payload.title = document.getElementById('prototypeTitleInput').value.trim();
-                payload.output = document.getElementById('prototypeOutputInput').value;
-                if(!payload.title) { showToast("Укажите название проработки!"); vibe([50,50,50]); return; }
-                if(!payload.output || parseFloat(payload.output) <= 0) { showToast("Укажите итоговый выход!"); vibe([50,50,50]); return; }
-            }
-            
-            Array.from(inputs).forEach(inp => {
-                let v = parseFloat(inp.value) || 0;
-                if(v > 0) { let idx = parseInt(inp.getAttribute('data-idx')); let ori = appData.items1c[idx]; payload.items.push({ name: ori.name, unit: ori.unit, volume: v }); }
-            });
-            
-            if(payload.items.length === 0) { showToast("Выберите продукт!"); vibe([50,50,50]); return; }
-            
-            let btn = document.querySelector('#actionModal button:last-child');
-            let oldText = btn.innerText; btn.innerText = "Отправка..."; btn.disabled = true;
-            
-            if(activeActionType === 'writeoff') {
-                payload.items.forEach(item => { fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "writeOff", userName: currentUser.name, name: item.name, unit: item.unit, volume: item.volume, reason: payload.reason }) }); });
-            } else {
-                fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-            }
-            
-            setTimeout(() => {
-                btn.innerText = oldText; btn.disabled = false;
-                let msg = "Успешно отправлено";
-                if (activeActionType === 'writeoff') msg = "Акт списания отправлен";
-                if (activeActionType === 'dinner') msg = "Акт питания отправлен";
-                if (activeActionType === 'inventory') msg = "Инвентаризация отправлена";
-                if (activeActionType === 'prototype') msg = "Акт проработки отправлен";
-                
-                vibe(30); // Успешная отправка: короткий щелчок
-                showToast(msg); closeActionModal();
-            }, 1000);
-        }
-    </script>
+let eventClasses = ev ? "ring-1 ring-gold shadow-[0_0_8px_rgba(212,175,55,0.4)] cursor-pointer active:scale-95" : "";
+let clickHandler = ev ? `onclick="openCalendarEvent(${d}, \`${ev.text.replace(/`/g, "'")}\`)"` : "";
+
+let cellHtml = `<div class="${baseClasses} ${stateClasses} ${eventClasses}" ${clickHandler}>
+<span class="text-[10px] opacity-60 font-serif">${d}</span>
+<span class="text-xs font-black mt-0.5">${shift ? shift.shift : '-'}</span>`;
+
+if(ev) {
+cellHtml += `<div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-gold rounded-full border border-dark animate-pulse"></div>`;
+}
+
+cellHtml += `</div>`;
+grid.innerHTML += cellHtml;
+}
+
+let fList = document.getElementById('finesList'); fList.innerHTML = '';
+if(appData.fines.length === 0) { fList.innerHTML = `<p class="text-xs text-mutedtext py-2 font-serif italic">Нарушений и бонусов не обнаружено.</p>`; }
+else {
+appData.fines.forEach(f => {
+let isBonus = f.type.toLowerCase() === 'бонус';
+fList.innerHTML += `<div class="bg-card border border-bordercolor p-3 rounded-xl flex justify-between items-center elegant-shadow"><div><p class="text-sm font-medium text-lighttext font-serif">${f.reason}</p><p class="text-[10px] text-mutedtext mt-0.5">${f.date}</p></div><span class="text-sm font-mono font-bold ${isBonus ? 'text-[#88B08A]' : 'text-[#D47070]'}">${isBonus ? '+' : '-'}${f.volume} ₽</span></div>`;
+});
+}
+}
+
+function openCalendarEvent(day, text) {
+document.getElementById('eventModalDay').innerText = `${day} число`;
+document.getElementById('eventModalText').innerText = text;
+document.getElementById('calendarEventModal').classList.remove('hidden');
+}
+function closeCalendarEvent() {
+document.getElementById('calendarEventModal').classList.add('hidden');
+}
+
+function renderTtkCategories() {
+let bar = document.getElementById('categoriesBar');
+let cats = ['Все', ...new Set(appData.recipes.map(r => r.category))];
+bar.innerHTML = cats.map(c => `<button onclick="selectCategory('${c}')" class="px-5 py-1.5 text-xs rounded-full whitespace-nowrap border font-serif tracking-widest uppercase transition ${selectedCategory === c ? 'bg-gold text-dark border-gold font-bold' : 'bg-card border-bordercolor text-mutedtext'}">${c}</button>`).join('');
+}
+function selectCategory(cat) { selectedCategory = cat; renderTtkCategories(); filterTtk(); }
+
+function renderTtkList() {
+let container = document.getElementById('ttkList');
+let filtered = appData.recipes.filter(r => selectedCategory === 'Все' || r.category === selectedCategory);
+container.innerHTML = filtered.map(r => `<div onclick="openTtkModal('${r.name}')" class="bg-card border border-bordercolor p-4 rounded-xl flex flex-col justify-between h-28 elegant-shadow cursor-pointer active:scale-95 transition"><div><span class="text-[9px] font-bold text-goldmuted uppercase tracking-widest">${r.category}</span><h4 class="font-bold font-serif text-lg text-lighttext mt-1 leading-tight line-clamp-2">${r.name}</h4></div><p class="text-[11px] text-mutedtext font-serif italic">Выход: ${r.ingredients[0]?.output || '—'}</p></div>`).join('');
+}
+
+function filterTtk() {
+let query = document.getElementById('searchTtk').value.toLowerCase().trim();
+let cards = document.getElementById('ttkList').children;
+appData.recipes.filter(r => selectedCategory === 'Все' || r.category === selectedCategory).forEach((r, idx) => {
+if(cards[idx]) { cards[idx].style.display = (r.name.toLowerCase().includes(query) || r.ingredients.some(i => i.name.toLowerCase().includes(query))) ? 'flex' : 'none'; }
+});
+}
+
+function openTtkModal(name) {
+let r = appData.recipes.find(rec => rec.name === name); if(!r) return; activeModalRecipe = r;
+document.getElementById('modalRecipeCategory').innerText = r.category;
+document.getElementById('modalRecipeName').innerText = r.name;
+document.getElementById('modalRecipeOutput').innerText = `Выход: ${r.ingredients[0]?.output || '—'}`;
+let descBlock = document.getElementById('modalRecipeDescriptionBlock');
+let descText = document.getElementById('modalRecipeDescription');
+if(r.description && r.description.trim() !== "") {
+descText.innerText = r.description;
+let textLen = r.description.length;
+if(textLen > 250) { descText.className = "font-serif italic leading-relaxed text-mutedtext text-[11px] sm:text-xs"; }
+else if(textLen > 100) { descText.className = "font-serif italic leading-relaxed text-mutedtext text-xs sm:text-sm"; }
+else { descText.className = "font-serif italic leading-relaxed text-goldmuted text-sm sm:text-base"; }
+descBlock.classList.remove('hidden');
+} else { descBlock.classList.add('hidden'); }
+document.getElementById('ttkMultiplier').value = 1; recalcTtk(1);
+document.getElementById('ttkModal').classList.remove('hidden');
+}
+
+function recalcTtk(mStr) {
+if(!activeModalRecipe) return; let m = parseFloat(mStr) || 0; if(m < 0) m = 0;
+document.getElementById('modalTtkBody').innerHTML = activeModalRecipe.ingredients.map(i => `
+<tr class="border-b border-bordercolor">
+<td class="py-3 font-serif text-lighttext text-sm">${i.name}</td>
+<td class="py-3 text-center text-mutedtext uppercase text-[10px] tracking-widest">${i.unit}</td>
+<td class="py-3 text-right font-mono text-gold font-bold text-sm">${(i.brutto * m).toFixed(3).replace(/\.000$/, '')}</td>
+</tr>`).join('');
+}
+function closeTtkModal() { document.getElementById('ttkModal').classList.add('hidden'); }
+
+function toggleIndividualInput() {
+let select = document.getElementById('actionReasonSelect');
+let input = document.getElementById('actionStaffNameInput');
+if(select.value === 'Индивидуальное списание') { input.classList.remove('hidden'); } else { input.classList.add('hidden'); }
+}
+
+function openActionModal(type) {
+activeActionType = type; document.getElementById('actionModal').classList.remove('hidden'); document.getElementById('actionSearch').value = '';
+document.getElementById('actionMetaRow').classList.add('hidden');
+document.getElementById('dinnerMetaRow').classList.add('hidden');
+document.getElementById('prototypeMetaRow').classList.add('hidden');
+document.getElementById('actionStaffNameInput').classList.add('hidden');
+document.getElementById('actionStaffNameInput').value = '';
+document.getElementById('prototypeTitleInput').value = '';
+document.getElementById('prototypeOutputInput').value = '';
+document.getElementById('actionReasonSelect').value = 'Порча';
+let title = "Инвентаризация";
+if(type === 'writeoff') { title = "Журнал: Брак и Порча"; document.getElementById('actionMetaRow').classList.remove('hidden'); }
+else if(type === 'dinner') { title = "Журнал: Питание Стаффа"; document.getElementById('dinnerMetaRow').classList.remove('hidden'); }
+else if(type === 'prototype') { title = "Лаборатория: Проработка"; document.getElementById('prototypeMetaRow').classList.remove('hidden'); }
+document.getElementById('actionModalTitle').innerText = title; renderActionItems();
+}
+
+// ВАЖНО: Добавлено событие oninput="filterActionItems()" для мгновенного пинга корзины
+function renderActionItems() {
+document.getElementById('actionItemsList').innerHTML = appData.items1c.map((item, idx) => `
+<div class="action-item-row p-3 mb-1 border-b border-bordercolor flex justify-between items-center gap-4 transition-all duration-300 rounded-lg" data-name="${item.name.toLowerCase()}">
+<div class="flex-1"><p class="text-sm font-medium text-lighttext font-serif">${item.name}</p><p class="text-[10px] text-mutedtext uppercase mt-0.5 tracking-widest">${item.unit}</p></div>
+<input type="number" step="0.001" placeholder="0.0" class="action-val-input w-24 bg-dark border border-bordercolor rounded-lg px-2 py-2 text-right text-gold font-mono text-sm focus:outline-none focus:border-gold transition-colors" data-idx="${idx}" oninput="filterActionItems()">
+</div>`).join('');
+}
+
+// УМНАЯ КОРЗИНА: Поднимаем выбранные товары на самый верх
+function filterActionItems() {
+let query = document.getElementById('actionSearch').value.toLowerCase().trim();
+Array.from(document.getElementById('actionItemsList').getElementsByClassName('action-item-row')).forEach(row => {
+let inputField = row.querySelector('.action-val-input');
+let val = parseFloat(inputField.value) || 0;
+
+if (row.getAttribute('data-name').includes(query) || val > 0) {
+row.style.display = 'flex';
+row.style.order = val > 0 ? -1 : 0; // Закрепляем сверху
+
+// Красивая подсветка выбранного продукта (эффект корзины)
+if(val > 0) {
+row.classList.add('bg-gold/10', 'border-gold/30');
+row.classList.remove('border-bordercolor');
+} else {
+row.classList.remove('bg-gold/10', 'border-gold/30');
+row.classList.add('border-bordercolor');
+}
+} else {
+row.style.display = 'none';
+}
+});
+}
+function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
+
+function submitActionData() {
+let inputs = document.getElementById('actionItemsList').getElementsByClassName('action-val-input');
+
+// ИСПРАВЛЕНИЕ ОШИБКИ С ПИТАНИЕМ: Жесткая привязка команд к Гугл Таблице
+let serverAction = activeActionType;
+if (activeActionType === 'writeoff') serverAction = 'writeOff';
+if (activeActionType === 'dinner') serverAction = 'staffDinner';
+
+let payload = { action: serverAction, userName: currentUser.name, items: [] };
+
+if (activeActionType === 'writeoff') {
+let reasonVal = document.getElementById('actionReasonSelect').value;
+if(reasonVal === 'Индивидуальное списание') {
+let staffName = document.getElementById('actionStaffNameInput').value.trim();
+if(!staffName) { showToast("Укажите фамилию сотрудника!"); vibe([50,50,50]); return; }
+reasonVal = `Индивидуальное списание (${staffName})`;
+}
+payload.reason = reasonVal;
+} else if (activeActionType === 'dinner') {
+payload.title = document.getElementById('dinnerTypeSelect').value;
+} else if (activeActionType === 'prototype') {
+payload.title = document.getElementById('prototypeTitleInput').value.trim();
+payload.output = document.getElementById('prototypeOutputInput').value;
+if(!payload.title) { showToast("Укажите название проработки!"); vibe([50,50,50]); return; }
+if(!payload.output || parseFloat(payload.output) <= 0) { showToast("Укажите итоговый выход!"); vibe([50,50,50]); return; }
+}
+
+Array.from(inputs).forEach(inp => {
+let v = parseFloat(inp.value) || 0;
+if(v > 0) { let idx = parseInt(inp.getAttribute('data-idx')); let ori = appData.items1c[idx]; payload.items.push({ name: ori.name, unit: ori.unit, volume: v }); }
+});
+
+if(payload.items.length === 0) { showToast("Выберите продукт!"); vibe([50,50,50]); return; }
+
+let btn = document.querySelector('#actionModal button:last-child');
+let oldText = btn.innerText; btn.innerText = "Отправка..."; btn.disabled = true;
+
+// ИСПРАВЛЕНИЕ: Пакетная отправка всех списаний за один запрос
+fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
+
+setTimeout(() => {
+btn.innerText = oldText; btn.disabled = false;
+let msg = "Успешно отправлено";
+if (activeActionType === 'writeoff') msg = "Акт списания отправлен";
+if (activeActionType === 'dinner') msg = "Акт питания отправлен";
+if (activeActionType === 'inventory') msg = "Инвентаризация отправлена";
+if (activeActionType === 'prototype') msg = "Акт проработки отправлен";
+
+vibe(30); // Успешная отправка: короткий щелчок
+showToast(msg); closeActionModal();
+}, 1000);
+}
+</script>
 </body>
 </html>
