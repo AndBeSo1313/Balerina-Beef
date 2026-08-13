@@ -37,7 +37,7 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 
 <!-- Тост Уведомлений -->
 <div id="customToast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-md border border-gold px-6 py-4 rounded-xl elegant-shadow z-[100] transition-all duration-500 transform -translate-y-32 opacity-0 flex items-center gap-3 w-max max-w-[90vw] pointer-events-none">
-<span class="text-xl leading-none">⚜️</span>
+<span class="text-xl leading-none" id="toastIcon">⚜️</span>
 <p id="toastMessage" class="text-gold font-serif font-bold tracking-widest uppercase text-[11px] sm:text-xs text-center"></p>
 </div>
 
@@ -90,7 +90,6 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </header>
 
 <main id="mainContent" class="flex-1 px-4 py-5 space-y-6 overflow-y-auto relative z-10">
-<!-- Главная -->
 <div id="section-home" class="space-y-6">
 <div class="bg-card/90 backdrop-blur-sm border border-bordercolor rounded-xl p-5 space-y-3 elegant-shadow relative overflow-hidden">
 <div class="absolute -right-4 -top-4 text-gold opacity-5 text-8xl font-serif">₽</div>
@@ -117,14 +116,12 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 </div>
 
-<!-- ТТК -->
 <div id="section-ttk" class="space-y-5 hidden">
 <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="categoriesBar"></div>
 <input type="text" id="searchTtk" oninput="filterTtk()" placeholder="Поиск по меню..." class="w-full bg-card/90 backdrop-blur-sm border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext placeholder-mutedtext focus:outline-none focus:border-gold font-serif italic">
 <div id="ttkList" class="grid grid-cols-2 gap-3 relative z-10"></div>
 </div>
 
-<!-- Журналы -->
 <div id="section-actions" class="space-y-5 hidden">
 <div id="adminPanelBlock" class="hidden bg-dark/90 backdrop-blur-md border border-gold rounded-xl p-5 space-y-4 elegant-shadow relative z-10">
 <div class="border-b border-bordercolor pb-3">
@@ -170,13 +167,15 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 <button onclick="switchTab('ttk')" id="btn-ttk" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
 <span class="text-xl leading-none">📖</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Меню</span>
 </button>
-<button onclick="switchTab('actions')" id="btn-actions" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
-<span class="text-xl leading-none">⚖️</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Журналы</span>
+<!-- БЕЙДЖ ДЛЯ ОЧЕРЕДИ -->
+<button onclick="switchTab('actions')" id="btn-actions" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60 relative">
+<span class="text-xl leading-none">⚖️</span>
+<span class="text-[9px] font-serif uppercase tracking-widest font-bold">Журналы</span>
+<div id="syncBadge" class="absolute top-0 right-3 bg-[#D47070] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden">0</div>
 </button>
 </nav>
 </div>
 
-<!-- Модалка ТТК -->
 <div id="ttkModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeTtkModal()">
 <div class="bg-card border-t border-gold rounded-t-2xl w-full max-w-md p-6 space-y-5 max-h-[85vh] overflow-y-auto elegant-shadow" onclick="event.stopPropagation()">
 <div class="flex justify-between items-start border-b border-bordercolor pb-4">
@@ -208,12 +207,18 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 </div>
 
-<!-- Модалка Действий (Инвентаризация / Списание / Проработка) -->
+<!-- Универсальная Модалка Действий -->
 <div id="actionModal" class="fixed inset-0 bg-dark z-50 flex flex-col hidden">
 <header class="px-4 py-4 border-b border-bordercolor flex justify-between items-center bg-card">
 <h3 id="actionModalTitle" class="font-serif font-bold text-gold text-lg tracking-wide uppercase">Действие</h3>
 <button onclick="closeActionModal()" class="text-mutedtext p-1 text-sm font-serif italic">Отмена</button>
 </header>
+
+<!-- НОВОЕ: ВЫБОР ДАТЫ -->
+<div class="p-4 bg-card border-b border-bordercolor hidden" id="actionDateRow">
+<label class="text-xs text-mutedtext block mb-1.5 font-serif italic">Дата операции:</label>
+<input type="date" id="actionDateInput" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif">
+</div>
 
 <div class="p-4 bg-card border-b border-bordercolor hidden" id="prototypeMetaRow">
 <input type="text" id="prototypeTitleInput" placeholder="Название блюда / полуфабриката" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif mb-3">
@@ -239,11 +244,10 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 <input type="text" id="actionSearch" oninput="filterActionItems()" placeholder="Поиск продукта по 1С..." class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-2.5 text-sm text-lighttext focus:outline-none font-serif italic">
 </div>
 
-<!-- ВАЖНО: flex-col позволяет нам поднимать выбранные элементы наверх с помощью order -->
 <div class="flex-1 overflow-y-auto px-4 pb-24 flex flex-col" id="actionItemsList"></div>
 
 <div class="fixed bottom-0 left-0 right-0 p-4 bg-card/95 backdrop-blur border-t border-bordercolor flex gap-3">
-<button onclick="submitActionData()" class="flex-1 bg-gradient-to-r from-goldmuted to-gold text-dark font-serif font-bold text-lg tracking-widest uppercase py-3.5 rounded-lg active:scale-[0.98] transition elegant-shadow">Отправить Акт</button>
+<button onclick="submitActionData()" id="btnSubmitAction" class="flex-1 bg-gradient-to-r from-goldmuted to-gold text-dark font-serif font-bold text-lg tracking-widest uppercase py-3.5 rounded-lg active:scale-[0.98] transition elegant-shadow">Отправить Акт</button>
 </div>
 </div>
 
@@ -276,20 +280,83 @@ const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN
 let appData = { schedule: [], position: "Повар", rate: 0, role: "Повар", recipes: [], items1c: [], info: [], fines: [], allUsers: [], events: [] };
 let currentUser = null; let currentTab = 'home'; let selectedCategory = 'Все'; let activeModalRecipe = null; let activeActionType = 'inventory';
 
-// ТАКТИЛЬНАЯ ОТДАЧА (Только для ошибок и успешной отправки актов)
-function vibe(ms = 30) {
-if ("vibrate" in navigator) { navigator.vibrate(ms); }
-}
+function vibe(ms = 30) { if ("vibrate" in navigator) { navigator.vibrate(ms); } }
 
 window.onload = () => {
 const savedUser = localStorage.getItem('kitchen_user');
 if (savedUser) { currentUser = JSON.parse(savedUser); showApp(); }
 startNightWatcher();
+updateQueueIndicator();
 };
 
-function showToast(message) {
+// --- УМНАЯ ОЧЕРЕДЬ (ОФЛАЙН РЕЖИМ) ---
+window.addEventListener('online', () => { showToast("🌐 Интернет восстановлен", "⚜️"); syncQueue(); });
+window.addEventListener('offline', () => { showToast("⚠️ Нет сети. Включен офлайн-режим", "⚠️"); vibe([50, 50]); });
+
+function updateQueueIndicator() {
+let q = JSON.parse(localStorage.getItem('kitchen_sync_queue') || '[]');
+let badge = document.getElementById('syncBadge');
+if(q.length > 0) { badge.innerText = q.length; badge.classList.remove('hidden'); }
+else { badge.classList.add('hidden'); }
+}
+
+function queueData(payload, successMsg) {
+let q = JSON.parse(localStorage.getItem('kitchen_sync_queue') || '[]');
+q.push({ payload: payload, msg: successMsg, id: Date.now() });
+localStorage.setItem('kitchen_sync_queue', JSON.stringify(q));
+
+vibe([50, 50, 50]);
+showToast("⚠️ Нет сети! Сохранено в память телефона", "💾");
+closeActionModal();
+updateQueueIndicator();
+}
+
+function sendOrQueue(payload, successMsg) {
+let btn = document.getElementById('btnSubmitAction');
+if(btn) { btn.innerText = "Отправка..."; btn.disabled = true; }
+
+if (!navigator.onLine) {
+if(btn) { btn.innerText = "Отправить Акт"; btn.disabled = false; }
+queueData(payload, successMsg);
+return;
+}
+
+fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+.then(() => {
+if(btn) { btn.innerText = "Отправить Акт"; btn.disabled = false; }
+vibe(30); showToast(successMsg, "✓"); closeActionModal();
+})
+.catch(err => {
+if(btn) { btn.innerText = "Отправить Акт"; btn.disabled = false; }
+queueData(payload, successMsg);
+});
+}
+
+function syncQueue() {
+if (!navigator.onLine) return;
+let q = JSON.parse(localStorage.getItem('kitchen_sync_queue') || '[]');
+if (q.length === 0) { updateQueueIndicator(); return; }
+
+let item = q[0];
+fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(item.payload) })
+.then(() => {
+q.shift();
+localStorage.setItem('kitchen_sync_queue', JSON.stringify(q));
+showToast("🔄 Отправлено из памяти: " + item.msg, "✓");
+updateQueueIndicator();
+if(q.length > 0) { setTimeout(syncQueue, 1500); }
+})
+.catch(err => console.log("Ожидание стабильной сети..."));
+}
+
+function showToast(message, icon = "⚜️") {
 let toast = document.getElementById('customToast');
+document.getElementById('toastIcon').innerText = icon;
 document.getElementById('toastMessage').innerText = message;
+
+if(icon === "⚠️" || icon === "💾") { document.getElementById('toastMessage').className = "text-[#D47070] font-serif font-bold tracking-widest uppercase text-[11px] sm:text-xs text-center"; }
+else { document.getElementById('toastMessage').className = "text-gold font-serif font-bold tracking-widest uppercase text-[11px] sm:text-xs text-center"; }
+
 toast.classList.remove('-translate-y-32', 'opacity-0');
 toast.classList.add('translate-y-0', 'opacity-100');
 setTimeout(() => {
@@ -306,12 +373,8 @@ document.getElementById('nightModal').classList.remove('hidden');
 }
 }
 function startNightWatcher() { setInterval(checkNightTime, 60000); }
-
 function closeNightModal() { document.getElementById('nightModal').classList.add('hidden'); }
-function goToWriteoffs() {
-document.getElementById('nightModal').classList.add('hidden');
-switchTab('actions');
-}
+function goToWriteoffs() { document.getElementById('nightModal').classList.add('hidden'); switchTab('actions'); }
 
 function handleLogin() {
 let log = document.getElementById('loginInput').value.trim();
@@ -319,26 +382,20 @@ let pas = document.getElementById('passInput').value.trim();
 if(!log || !pas) return;
 document.getElementById('authError').classList.add('hidden');
 let btn = document.getElementById('loginBtn');
-let originalText = btn.innerText;
-btn.innerText = "ПРОВЕРКА...";
-btn.disabled = true;
+let originalText = btn.innerText; btn.innerText = "ПРОВЕРКА..."; btn.disabled = true;
+
+if(!navigator.onLine) { showToast("Для входа нужен интернет!", "⚠️"); vibe([50,50]); btn.innerText = originalText; btn.disabled = false; return; }
 
 fetch(`${WEB_APP_URL}?action=login&login=${encodeURIComponent(log)}&password=${encodeURIComponent(pas)}`)
 .then(res => res.json())
 .then(data => {
-btn.innerText = originalText;
-btn.disabled = false;
+btn.innerText = originalText; btn.disabled = false;
 if(data.status === "success") {
 currentUser = { name: data.user.name, role: data.user.role };
 localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
 showApp();
-} else {
-vibe([50, 50, 50]); // Ошибка: тройная вибрация
-document.getElementById('authError').classList.remove('hidden');
-}
-}).catch(err => {
-btn.innerText = originalText; btn.disabled = false; showToast("Ошибка связи");
-});
+} else { vibe([50, 50, 50]); document.getElementById('authError').classList.remove('hidden'); }
+}).catch(err => { btn.innerText = originalText; btn.disabled = false; showToast("Ошибка связи", "⚠️"); });
 }
 
 function handleLogout() { localStorage.removeItem('kitchen_user'); location.reload(); }
@@ -349,12 +406,15 @@ document.getElementById('appContainer').classList.remove('hidden');
 document.getElementById('appContainer').classList.add('flex');
 loadAppData();
 setTimeout(checkNightTime, 2000);
+setTimeout(syncQueue, 3000);
 }
 
 function loadAppData() {
 if(!currentUser) return;
 document.getElementById('userNameText').innerText = currentUser.name;
 document.getElementById('userInitial').innerText = currentUser.name.charAt(0).toUpperCase();
+
+if(!navigator.onLine) { showToast("Загружена офлайн версия", "💾"); return; }
 
 let cacheBuster = new Date().getTime();
 fetch(`${WEB_APP_URL}?action=getAppData&userName=${encodeURIComponent(currentUser.name)}&t=${cacheBuster}`)
@@ -363,10 +423,7 @@ if(data.status === "success") {
 appData = data;
 currentUser.role = data.role;
 localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
-renderHome();
-renderTtkCategories();
-renderTtkList();
-checkAdminStatus();
+renderHome(); renderTtkCategories(); renderTtkList(); checkAdminStatus();
 }
 }).catch(err => console.log("Ошибка сети:", err));
 }
@@ -392,9 +449,9 @@ let employee = document.getElementById('adminWorkerSelect').value;
 let day = document.getElementById('adminDaySelect').value;
 let val = document.getElementById('adminShiftSelect').value;
 if(!employee || !day || !val) return;
-fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "confirmShift", employeeName: employee, day: day, shiftValue: val }) });
-showToast(`Смена утверждена`);
-loadAppData();
+
+let payload = { action: "confirmShift", employeeName: employee, day: day, shiftValue: val };
+sendOrQueue(payload, `Смена утверждена`);
 }
 
 function switchTab(tab) {
@@ -404,7 +461,9 @@ document.getElementById(`section-${t}`).classList.add('hidden');
 document.getElementById(`btn-${t}`).className = "flex flex-col items-center space-y-1 text-mutedtext opacity-60 transition";
 });
 document.getElementById(`section-${tab}`).classList.remove('hidden');
-document.getElementById(`btn-${tab}`).className = "flex flex-col items-center space-y-1 text-gold scale-110 transition";
+let btnClass = "flex flex-col items-center space-y-1 text-gold scale-110 transition";
+if(tab === 'actions') btnClass += " relative";
+document.getElementById(`btn-${tab}`).className = btnClass;
 }
 
 function renderHome() {
@@ -446,7 +505,6 @@ let isPast = d <= currentDay;
 
 let baseClasses = "aspect-square flex flex-col items-center justify-center rounded-lg border p-1 min-w-[40px] relative transition-all duration-300";
 let stateClasses = isWork ? (isPast ? 'bg-gold/20 text-gold border-gold' : 'bg-dark border-bordercolor text-lighttext font-bold') : 'bg-dark border-bordercolor/50 text-mutedtext';
-
 let eventClasses = ev ? "ring-1 ring-gold shadow-[0_0_8px_rgba(212,175,55,0.4)] cursor-pointer active:scale-95" : "";
 let clickHandler = ev ? `onclick="openCalendarEvent(${d}, \`${ev.text.replace(/`/g, "'")}\`)"` : "";
 
@@ -454,12 +512,8 @@ let cellHtml = `<div class="${baseClasses} ${stateClasses} ${eventClasses}" ${cl
 <span class="text-[10px] opacity-60 font-serif">${d}</span>
 <span class="text-xs font-black mt-0.5">${shift ? shift.shift : '-'}</span>`;
 
-if(ev) {
-cellHtml += `<div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-gold rounded-full border border-dark animate-pulse"></div>`;
-}
-
-cellHtml += `</div>`;
-grid.innerHTML += cellHtml;
+if(ev) { cellHtml += `<div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-gold rounded-full border border-dark animate-pulse"></div>`; }
+cellHtml += `</div>`; grid.innerHTML += cellHtml;
 }
 
 let fList = document.getElementById('finesList'); fList.innerHTML = '';
@@ -477,9 +531,7 @@ document.getElementById('eventModalDay').innerText = `${day} число`;
 document.getElementById('eventModalText').innerText = text;
 document.getElementById('calendarEventModal').classList.remove('hidden');
 }
-function closeCalendarEvent() {
-document.getElementById('calendarEventModal').classList.add('hidden');
-}
+function closeCalendarEvent() { document.getElementById('calendarEventModal').classList.add('hidden'); }
 
 function renderTtkCategories() {
 let bar = document.getElementById('categoriesBar');
@@ -540,6 +592,8 @@ if(select.value === 'Индивидуальное списание') { input.cla
 
 function openActionModal(type) {
 activeActionType = type; document.getElementById('actionModal').classList.remove('hidden'); document.getElementById('actionSearch').value = '';
+
+document.getElementById('actionDateRow').classList.add('hidden');
 document.getElementById('actionMetaRow').classList.add('hidden');
 document.getElementById('dinnerMetaRow').classList.add('hidden');
 document.getElementById('prototypeMetaRow').classList.add('hidden');
@@ -548,14 +602,32 @@ document.getElementById('actionStaffNameInput').value = '';
 document.getElementById('prototypeTitleInput').value = '';
 document.getElementById('prototypeOutputInput').value = '';
 document.getElementById('actionReasonSelect').value = 'Порча';
+
 let title = "Инвентаризация";
-if(type === 'writeoff') { title = "Журнал: Брак и Порча"; document.getElementById('actionMetaRow').classList.remove('hidden'); }
-else if(type === 'dinner') { title = "Журнал: Питание Стаффа"; document.getElementById('dinnerMetaRow').classList.remove('hidden'); }
-else if(type === 'prototype') { title = "Лаборатория: Проработка"; document.getElementById('prototypeMetaRow').classList.remove('hidden'); }
+if(type === 'writeoff') {
+title = "Журнал: Брак и Порча";
+document.getElementById('actionMetaRow').classList.remove('hidden');
+document.getElementById('actionDateRow').classList.remove('hidden');
+}
+else if(type === 'dinner') {
+title = "Журнал: Питание Стаффа";
+document.getElementById('dinnerMetaRow').classList.remove('hidden');
+document.getElementById('actionDateRow').classList.remove('hidden');
+}
+else if(type === 'prototype') {
+title = "Лаборатория: Проработка";
+document.getElementById('prototypeMetaRow').classList.remove('hidden');
+}
+
+// Устанавливаем текущую дату в поле "Дата операции"
+let tzOffset = (new Date()).getTimezoneOffset() * 60000;
+let localISOTime = (new Date(Date.now() - tzOffset)).toISOString().split('T')[0];
+document.getElementById('actionDateInput').value = localISOTime;
+document.getElementById('actionDateInput').max = localISOTime;
+
 document.getElementById('actionModalTitle').innerText = title; renderActionItems();
 }
 
-// ВАЖНО: Добавлено событие oninput="filterActionItems()" для мгновенного пинга корзины
 function renderActionItems() {
 document.getElementById('actionItemsList').innerHTML = appData.items1c.map((item, idx) => `
 <div class="action-item-row p-3 mb-1 border-b border-bordercolor flex justify-between items-center gap-4 transition-all duration-300 rounded-lg" data-name="${item.name.toLowerCase()}">
@@ -564,7 +636,6 @@ document.getElementById('actionItemsList').innerHTML = appData.items1c.map((item
 </div>`).join('');
 }
 
-// УМНАЯ КОРЗИНА: Поднимаем выбранные товары на самый верх
 function filterActionItems() {
 let query = document.getElementById('actionSearch').value.toLowerCase().trim();
 Array.from(document.getElementById('actionItemsList').getElementsByClassName('action-item-row')).forEach(row => {
@@ -573,9 +644,7 @@ let val = parseFloat(inputField.value) || 0;
 
 if (row.getAttribute('data-name').includes(query) || val > 0) {
 row.style.display = 'flex';
-row.style.order = val > 0 ? -1 : 0; // Закрепляем сверху
-
-// Красивая подсветка выбранного продукта (эффект корзины)
+row.style.order = val > 0 ? -1 : 0;
 if(val > 0) {
 row.classList.add('bg-gold/10', 'border-gold/30');
 row.classList.remove('border-bordercolor');
@@ -583,9 +652,7 @@ row.classList.remove('border-bordercolor');
 row.classList.remove('bg-gold/10', 'border-gold/30');
 row.classList.add('border-bordercolor');
 }
-} else {
-row.style.display = 'none';
-}
+} else { row.style.display = 'none'; }
 });
 }
 function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
@@ -593,18 +660,22 @@ function closeActionModal() { document.getElementById('actionModal').classList.a
 function submitActionData() {
 let inputs = document.getElementById('actionItemsList').getElementsByClassName('action-val-input');
 
-// ИСПРАВЛЕНИЕ ОШИБКИ С ПИТАНИЕМ: Жесткая привязка команд к Гугл Таблице
 let serverAction = activeActionType;
 if (activeActionType === 'writeoff') serverAction = 'writeOff';
 if (activeActionType === 'dinner') serverAction = 'staffDinner';
 
 let payload = { action: serverAction, userName: currentUser.name, items: [] };
 
+// Передаем дату из инпута
+if (activeActionType === 'writeoff' || activeActionType === 'dinner') {
+payload.customDate = document.getElementById('actionDateInput').value;
+}
+
 if (activeActionType === 'writeoff') {
 let reasonVal = document.getElementById('actionReasonSelect').value;
 if(reasonVal === 'Индивидуальное списание') {
 let staffName = document.getElementById('actionStaffNameInput').value.trim();
-if(!staffName) { showToast("Укажите фамилию сотрудника!"); vibe([50,50,50]); return; }
+if(!staffName) { showToast("Укажите фамилию сотрудника!", "⚠️"); vibe([50,50,50]); return; }
 reasonVal = `Индивидуальное списание (${staffName})`;
 }
 payload.reason = reasonVal;
@@ -613,8 +684,8 @@ payload.title = document.getElementById('dinnerTypeSelect').value;
 } else if (activeActionType === 'prototype') {
 payload.title = document.getElementById('prototypeTitleInput').value.trim();
 payload.output = document.getElementById('prototypeOutputInput').value;
-if(!payload.title) { showToast("Укажите название проработки!"); vibe([50,50,50]); return; }
-if(!payload.output || parseFloat(payload.output) <= 0) { showToast("Укажите итоговый выход!"); vibe([50,50,50]); return; }
+if(!payload.title) { showToast("Укажите название проработки!", "⚠️"); vibe([50,50,50]); return; }
+if(!payload.output || parseFloat(payload.output) <= 0) { showToast("Укажите итоговый выход!", "⚠️"); vibe([50,50,50]); return; }
 }
 
 Array.from(inputs).forEach(inp => {
@@ -622,25 +693,15 @@ let v = parseFloat(inp.value) || 0;
 if(v > 0) { let idx = parseInt(inp.getAttribute('data-idx')); let ori = appData.items1c[idx]; payload.items.push({ name: ori.name, unit: ori.unit, volume: v }); }
 });
 
-if(payload.items.length === 0) { showToast("Выберите продукт!"); vibe([50,50,50]); return; }
+if(payload.items.length === 0) { showToast("Выберите продукт!", "⚠️"); vibe([50,50,50]); return; }
 
-let btn = document.querySelector('#actionModal button:last-child');
-let oldText = btn.innerText; btn.innerText = "Отправка..."; btn.disabled = true;
-
-// ИСПРАВЛЕНИЕ: Пакетная отправка всех списаний за один запрос
-fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-
-setTimeout(() => {
-btn.innerText = oldText; btn.disabled = false;
 let msg = "Успешно отправлено";
 if (activeActionType === 'writeoff') msg = "Акт списания отправлен";
 if (activeActionType === 'dinner') msg = "Акт питания отправлен";
 if (activeActionType === 'inventory') msg = "Инвентаризация отправлена";
 if (activeActionType === 'prototype') msg = "Акт проработки отправлен";
 
-vibe(30); // Успешная отправка: короткий щелчок
-showToast(msg); closeActionModal();
-}, 1000);
+sendOrQueue(payload, msg);
 }
 </script>
 </body>
