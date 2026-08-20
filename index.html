@@ -167,7 +167,6 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 <button onclick="switchTab('ttk')" id="btn-ttk" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60">
 <span class="text-xl leading-none">📖</span><span class="text-[9px] font-serif uppercase tracking-widest font-bold">Меню</span>
 </button>
-<!-- БЕЙДЖ ДЛЯ ОЧЕРЕДИ -->
 <button onclick="switchTab('actions')" id="btn-actions" class="flex flex-col items-center space-y-1 text-mutedtext opacity-60 relative">
 <span class="text-xl leading-none">⚖️</span>
 <span class="text-[9px] font-serif uppercase tracking-widest font-bold">Журналы</span>
@@ -176,6 +175,7 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </nav>
 </div>
 
+<!-- Модалка ТТК -->
 <div id="ttkModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeTtkModal()">
 <div class="bg-card border-t border-gold rounded-t-2xl w-full max-w-md p-6 space-y-5 max-h-[85vh] overflow-y-auto elegant-shadow" onclick="event.stopPropagation()">
 <div class="flex justify-between items-start border-b border-bordercolor pb-4">
@@ -207,14 +207,13 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 </div>
 
-<!-- Универсальная Модалка Действий -->
+<!-- Модалка Действий -->
 <div id="actionModal" class="fixed inset-0 bg-dark z-50 flex flex-col hidden">
 <header class="px-4 py-4 border-b border-bordercolor flex justify-between items-center bg-card">
 <h3 id="actionModalTitle" class="font-serif font-bold text-gold text-lg tracking-wide uppercase">Действие</h3>
 <button onclick="closeActionModal()" class="text-mutedtext p-1 text-sm font-serif italic">Отмена</button>
 </header>
 
-<!-- НОВОЕ: ВЫБОР ДАТЫ -->
 <div class="p-4 bg-card border-b border-bordercolor hidden" id="actionDateRow">
 <label class="text-xs text-mutedtext block mb-1.5 font-serif italic">Дата операции:</label>
 <input type="date" id="actionDateInput" class="w-full bg-dark border border-bordercolor rounded-lg px-4 py-3 text-sm text-lighttext focus:outline-none font-serif">
@@ -251,7 +250,6 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 </div>
 
-<!-- Модалка Календарного События -->
 <div id="calendarEventModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-center justify-center hidden" onclick="closeCalendarEvent()">
 <div class="bg-card border border-gold rounded-2xl w-full max-w-[85vw] p-6 elegant-shadow relative text-center" onclick="event.stopPropagation()">
 <button onclick="closeCalendarEvent()" class="absolute top-3 right-4 text-mutedtext text-2xl hover:text-lighttext transition">&times;</button>
@@ -261,7 +259,6 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 </div>
 
-<!-- НОЧНОЕ НАПОМИНАНИЕ (23:00) -->
 <div id="nightModal" class="fixed inset-0 bg-dark/95 backdrop-blur-md z-[60] flex items-center justify-center hidden">
 <div class="bg-card border border-bordercolor rounded-2xl w-full max-w-[85vw] p-8 text-center elegant-shadow relative">
 <span class="text-5xl block mb-4 animate-pulse">🌙</span>
@@ -274,7 +271,6 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 </div>
 
-<!-- СКРИПТЫ -->
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec";
 let appData = { schedule: [], position: "Повар", rate: 0, role: "Повар", recipes: [], items1c: [], info: [], fines: [], allUsers: [], events: [] };
@@ -289,7 +285,6 @@ startNightWatcher();
 updateQueueIndicator();
 };
 
-// --- УМНАЯ ОЧЕРЕДЬ (ОФЛАЙН РЕЖИМ) ---
 window.addEventListener('online', () => { showToast("🌐 Интернет восстановлен", "⚜️"); syncQueue(); });
 window.addEventListener('offline', () => { showToast("⚠️ Нет сети. Включен офлайн-режим", "⚠️"); vibe([50, 50]); });
 
@@ -561,14 +556,18 @@ document.getElementById('modalRecipeName').innerText = r.name;
 document.getElementById('modalRecipeOutput').innerText = `Выход: ${r.ingredients[0]?.output || '—'}`;
 let descBlock = document.getElementById('modalRecipeDescriptionBlock');
 let descText = document.getElementById('modalRecipeDescription');
-if(r.description && r.description.trim() !== "") {
-descText.innerText = r.description;
-let textLen = r.description.length;
+
+// ИСПРАВЛЕНИЕ: Убрана проблема белого экрана для старых iPhone (убран оператор ?.)
+let desc = r.description ? r.description.trim() : "";
+if(desc !== "") {
+descText.innerText = desc;
+let textLen = desc.length;
 if(textLen > 250) { descText.className = "font-serif italic leading-relaxed text-mutedtext text-[11px] sm:text-xs"; }
 else if(textLen > 100) { descText.className = "font-serif italic leading-relaxed text-mutedtext text-xs sm:text-sm"; }
 else { descText.className = "font-serif italic leading-relaxed text-goldmuted text-sm sm:text-base"; }
 descBlock.classList.remove('hidden');
 } else { descBlock.classList.add('hidden'); }
+
 document.getElementById('ttkMultiplier').value = 1; recalcTtk(1);
 document.getElementById('ttkModal').classList.remove('hidden');
 }
@@ -619,7 +618,6 @@ title = "Лаборатория: Проработка";
 document.getElementById('prototypeMetaRow').classList.remove('hidden');
 }
 
-// Устанавливаем текущую дату в поле "Дата операции"
 let tzOffset = (new Date()).getTimezoneOffset() * 60000;
 let localISOTime = (new Date(Date.now() - tzOffset)).toISOString().split('T')[0];
 document.getElementById('actionDateInput').value = localISOTime;
@@ -666,7 +664,6 @@ if (activeActionType === 'dinner') serverAction = 'staffDinner';
 
 let payload = { action: serverAction, userName: currentUser.name, items: [] };
 
-// Передаем дату из инпута
 if (activeActionType === 'writeoff' || activeActionType === 'dinner') {
 payload.customDate = document.getElementById('actionDateInput').value;
 }
@@ -690,7 +687,12 @@ if(!payload.output || parseFloat(payload.output) <= 0) { showToast("Укажит
 
 Array.from(inputs).forEach(inp => {
 let v = parseFloat(inp.value) || 0;
-if(v > 0) { let idx = parseInt(inp.getAttribute('data-idx')); let ori = appData.items1c[idx]; payload.items.push({ name: ori.name, unit: ori.unit, volume: v }); }
+if(v > 0) {
+// ИСПРАВЛЕНИЕ: Безопасное чтение данных для старых iPhone (без ?.)
+let idx = parseInt(inp.getAttribute('data-idx'));
+let ori = appData.items1c[idx];
+payload.items.push({ name: ori.name, unit: ori.unit, volume: v });
+}
 });
 
 if(payload.items.length === 0) { showToast("Выберите продукт!", "⚠️"); vibe([50,50,50]); return; }
