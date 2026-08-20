@@ -33,16 +33,15 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 .elegant-shadow { box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
 </style>
 </head>
-<body class="bg-dark text-lighttext min-h-screen flex flex-col select-none">
+<!-- ЖЕСТКАЯ ЗАГЛУШКА ТЕМНОГО ФОНА (Чтобы избежать белого экрана на старых устройствах) -->
+<body class="bg-dark text-lighttext min-h-screen flex flex-col select-none" style="background-color: #110F0E; color: #F2EFE9;">
 
-<!-- Тост Уведомлений -->
 <div id="customToast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-md border border-gold px-6 py-4 rounded-xl elegant-shadow z-[100] transition-all duration-500 transform -translate-y-32 opacity-0 flex items-center gap-3 w-max max-w-[90vw] pointer-events-none">
 <span class="text-xl leading-none" id="toastIcon">⚜️</span>
 <p id="toastMessage" class="text-gold font-serif font-bold tracking-widest uppercase text-[11px] sm:text-xs text-center"></p>
 </div>
 
-<!-- Авторизация -->
-<div id="authScreen" class="fixed inset-0 bg-dark z-50 flex flex-col justify-center px-6 overflow-hidden">
+<div id="authScreen" class="fixed inset-0 bg-dark z-50 flex flex-col justify-center px-6 overflow-hidden" style="background-color: #110F0E;">
 <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
 <img src="./logo.png" alt="" class="w-[600px] h-[600px] object-contain opacity-[0.03] blur-[2px] grayscale">
 </div>
@@ -65,7 +64,6 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 </div>
 
-<!-- Основное приложение -->
 <div id="appContainer" class="hidden flex-col min-h-screen w-full pb-20 relative z-10">
 <div class="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
 <img src="./logo.png" alt="" class="w-[600px] h-[600px] object-contain opacity-[0.04] blur-[3px] grayscale">
@@ -175,7 +173,6 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </nav>
 </div>
 
-<!-- Модалка ТТК -->
 <div id="ttkModal" class="fixed inset-0 bg-dark/90 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeTtkModal()">
 <div class="bg-card border-t border-gold rounded-t-2xl w-full max-w-md p-6 space-y-5 max-h-[85vh] overflow-y-auto elegant-shadow" onclick="event.stopPropagation()">
 <div class="flex justify-between items-start border-b border-bordercolor pb-4">
@@ -207,7 +204,6 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 </div>
 </div>
 
-<!-- Модалка Действий -->
 <div id="actionModal" class="fixed inset-0 bg-dark z-50 flex flex-col hidden">
 <header class="px-4 py-4 border-b border-bordercolor flex justify-between items-center bg-card">
 <h3 id="actionModalTitle" class="font-serif font-bold text-gold text-lg tracking-wide uppercase">Действие</h3>
@@ -273,30 +269,30 @@ body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparen
 
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby42DjQ-GEVXyRDubiN3DxvG_u7G2t-EYRWRKlaf6OARVhe8UbJfDmwJOxyWg1aSOVuig/exec";
-let appData = { schedule: [], position: "Повар", rate: 0, role: "Повар", recipes: [], items1c: [], info: [], fines: [], allUsers: [], events: [] };
-let currentUser = null; let currentTab = 'home'; let selectedCategory = 'Все'; let activeModalRecipe = null; let activeActionType = 'inventory';
+var appData = { schedule: [], position: "Повар", rate: 0, role: "Повар", recipes: [], items1c: [], info: [], fines: [], allUsers: [], events: [] };
+var currentUser = null; var currentTab = 'home'; var selectedCategory = 'Все'; var activeModalRecipe = null; var activeActionType = 'inventory';
 
-function vibe(ms = 30) { if ("vibrate" in navigator) { navigator.vibrate(ms); } }
+function vibe(ms) { if (!ms) ms = 30; if ("vibrate" in navigator) { navigator.vibrate(ms); } }
 
-window.onload = () => {
-const savedUser = localStorage.getItem('kitchen_user');
+window.onload = function() {
+var savedUser = localStorage.getItem('kitchen_user');
 if (savedUser) { currentUser = JSON.parse(savedUser); showApp(); }
 startNightWatcher();
 updateQueueIndicator();
 };
 
-window.addEventListener('online', () => { showToast("🌐 Интернет восстановлен", "⚜️"); syncQueue(); });
-window.addEventListener('offline', () => { showToast("⚠️ Нет сети. Включен офлайн-режим", "⚠️"); vibe([50, 50]); });
+window.addEventListener('online', function() { showToast("🌐 Интернет восстановлен", "⚜️"); syncQueue(); });
+window.addEventListener('offline', function() { showToast("⚠️ Нет сети. Включен офлайн-режим", "⚠️"); vibe([50, 50]); });
 
 function updateQueueIndicator() {
-let q = JSON.parse(localStorage.getItem('kitchen_sync_queue') || '[]');
-let badge = document.getElementById('syncBadge');
+var q = JSON.parse(localStorage.getItem('kitchen_sync_queue') || '[]');
+var badge = document.getElementById('syncBadge');
 if(q.length > 0) { badge.innerText = q.length; badge.classList.remove('hidden'); }
 else { badge.classList.add('hidden'); }
 }
 
 function queueData(payload, successMsg) {
-let q = JSON.parse(localStorage.getItem('kitchen_sync_queue') || '[]');
+var q = JSON.parse(localStorage.getItem('kitchen_sync_queue') || '[]');
 q.push({ payload: payload, msg: successMsg, id: Date.now() });
 localStorage.setItem('kitchen_sync_queue', JSON.stringify(q));
 
@@ -307,7 +303,7 @@ updateQueueIndicator();
 }
 
 function sendOrQueue(payload, successMsg) {
-let btn = document.getElementById('btnSubmitAction');
+var btn = document.getElementById('btnSubmitAction');
 if(btn) { btn.innerText = "Отправка..."; btn.disabled = true; }
 
 if (!navigator.onLine) {
@@ -317,11 +313,11 @@ return;
 }
 
 fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
-.then(() => {
+.then(function() {
 if(btn) { btn.innerText = "Отправить Акт"; btn.disabled = false; }
 vibe(30); showToast(successMsg, "✓"); closeActionModal();
 })
-.catch(err => {
+.catch(function(err) {
 if(btn) { btn.innerText = "Отправить Акт"; btn.disabled = false; }
 queueData(payload, successMsg);
 });
@@ -329,23 +325,24 @@ queueData(payload, successMsg);
 
 function syncQueue() {
 if (!navigator.onLine) return;
-let q = JSON.parse(localStorage.getItem('kitchen_sync_queue') || '[]');
+var q = JSON.parse(localStorage.getItem('kitchen_sync_queue') || '[]');
 if (q.length === 0) { updateQueueIndicator(); return; }
 
-let item = q[0];
+var item = q[0];
 fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(item.payload) })
-.then(() => {
+.then(function() {
 q.shift();
 localStorage.setItem('kitchen_sync_queue', JSON.stringify(q));
 showToast("🔄 Отправлено из памяти: " + item.msg, "✓");
 updateQueueIndicator();
 if(q.length > 0) { setTimeout(syncQueue, 1500); }
 })
-.catch(err => console.log("Ожидание стабильной сети..."));
+.catch(function(err) { console.log("Ожидание стабильной сети..."); });
 }
 
-function showToast(message, icon = "⚜️") {
-let toast = document.getElementById('customToast');
+function showToast(message, icon) {
+if(!icon) icon = "⚜️";
+var toast = document.getElementById('customToast');
 document.getElementById('toastIcon').innerText = icon;
 document.getElementById('toastMessage').innerText = message;
 
@@ -354,14 +351,14 @@ else { document.getElementById('toastMessage').className = "text-gold font-serif
 
 toast.classList.remove('-translate-y-32', 'opacity-0');
 toast.classList.add('translate-y-0', 'opacity-100');
-setTimeout(() => {
+setTimeout(function() {
 toast.classList.remove('translate-y-0', 'opacity-100');
 toast.classList.add('-translate-y-32', 'opacity-0');
 }, 3500);
 }
 
 function checkNightTime() {
-let now = new Date();
+var now = new Date();
 if (now.getHours() >= 23 && !sessionStorage.getItem('nightAlertDone')) {
 sessionStorage.setItem('nightAlertDone', 'true');
 document.getElementById('nightModal').classList.remove('hidden');
@@ -372,25 +369,25 @@ function closeNightModal() { document.getElementById('nightModal').classList.add
 function goToWriteoffs() { document.getElementById('nightModal').classList.add('hidden'); switchTab('actions'); }
 
 function handleLogin() {
-let log = document.getElementById('loginInput').value.trim();
-let pas = document.getElementById('passInput').value.trim();
+var log = document.getElementById('loginInput').value.trim();
+var pas = document.getElementById('passInput').value.trim();
 if(!log || !pas) return;
 document.getElementById('authError').classList.add('hidden');
-let btn = document.getElementById('loginBtn');
-let originalText = btn.innerText; btn.innerText = "ПРОВЕРКА..."; btn.disabled = true;
+var btn = document.getElementById('loginBtn');
+var originalText = btn.innerText; btn.innerText = "ПРОВЕРКА..."; btn.disabled = true;
 
 if(!navigator.onLine) { showToast("Для входа нужен интернет!", "⚠️"); vibe([50,50]); btn.innerText = originalText; btn.disabled = false; return; }
 
-fetch(`${WEB_APP_URL}?action=login&login=${encodeURIComponent(log)}&password=${encodeURIComponent(pas)}`)
-.then(res => res.json())
-.then(data => {
+fetch(WEB_APP_URL + "?action=login&login=" + encodeURIComponent(log) + "&password=" + encodeURIComponent(pas))
+.then(function(res) { return res.json(); })
+.then(function(data) {
 btn.innerText = originalText; btn.disabled = false;
 if(data.status === "success") {
 currentUser = { name: data.user.name, role: data.user.role };
 localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
 showApp();
 } else { vibe([50, 50, 50]); document.getElementById('authError').classList.remove('hidden'); }
-}).catch(err => { btn.innerText = originalText; btn.disabled = false; showToast("Ошибка связи", "⚠️"); });
+}).catch(function(err) { btn.innerText = originalText; btn.disabled = false; showToast("Ошибка связи", "⚠️"); });
 }
 
 function handleLogout() { localStorage.removeItem('kitchen_user'); location.reload(); }
@@ -411,21 +408,22 @@ document.getElementById('userInitial').innerText = currentUser.name.charAt(0).to
 
 if(!navigator.onLine) { showToast("Загружена офлайн версия", "💾"); return; }
 
-let cacheBuster = new Date().getTime();
-fetch(`${WEB_APP_URL}?action=getAppData&userName=${encodeURIComponent(currentUser.name)}&t=${cacheBuster}`)
-.then(res => res.json()).then(data => {
+var cacheBuster = new Date().getTime();
+fetch(WEB_APP_URL + "?action=getAppData&userName=" + encodeURIComponent(currentUser.name) + "&t=" + cacheBuster)
+.then(function(res) { return res.json(); })
+.then(function(data) {
 if(data.status === "success") {
 appData = data;
 currentUser.role = data.role;
 localStorage.setItem('kitchen_user', JSON.stringify(currentUser));
 renderHome(); renderTtkCategories(); renderTtkList(); checkAdminStatus();
 }
-}).catch(err => console.log("Ошибка сети:", err));
+}).catch(function(err) { console.log("Ошибка сети:", err); });
 }
 
 function checkAdminStatus() {
-let role = appData.role ? appData.role.toLowerCase().trim() : "повар";
-let adminRoles = ["шеф-повар", "шеф", "су-шеф", "директор"];
+var role = appData.role ? appData.role.toLowerCase().trim() : "повар";
+var adminRoles = ["шеф-повар", "шеф", "су-шеф", "директор"];
 if(adminRoles.includes(role)) {
 document.getElementById('adminPanelBlock').classList.remove('hidden');
 renderAdminSelects();
@@ -433,135 +431,173 @@ renderAdminSelects();
 }
 
 function renderAdminSelects() {
-document.getElementById('adminWorkerSelect').innerHTML = appData.allUsers.map(u => `<option value="${u}">${u}</option>`).join('');
-let today = new Date().getDate();
-document.getElementById('adminDaySelect').innerHTML = Array.from({length: 31}, (_, i) => i + 1)
-.map(d => `<option value="${d}" ${d === today ? 'selected' : ''}>${d} число</option>`).join('');
+document.getElementById('adminWorkerSelect').innerHTML = appData.allUsers.map(function(u) { return "<option value='" + u + "'>" + u + "</option>"; }).join('');
+var today = new Date().getDate();
+var daysHtml = "";
+for(var i=1; i<=31; i++) {
+var sel = (i === today) ? "selected" : "";
+daysHtml += "<option value='" + i + "' " + sel + ">" + i + " число</option>";
+}
+document.getElementById('adminDaySelect').innerHTML = daysHtml;
 }
 
 function submitShiftConfirmation() {
-let employee = document.getElementById('adminWorkerSelect').value;
-let day = document.getElementById('adminDaySelect').value;
-let val = document.getElementById('adminShiftSelect').value;
+var employee = document.getElementById('adminWorkerSelect').value;
+var day = document.getElementById('adminDaySelect').value;
+var val = document.getElementById('adminShiftSelect').value;
 if(!employee || !day || !val) return;
 
-let payload = { action: "confirmShift", employeeName: employee, day: day, shiftValue: val };
-sendOrQueue(payload, `Смена утверждена`);
+var payload = { action: "confirmShift", employeeName: employee, day: day, shiftValue: val };
+sendOrQueue(payload, "Смена утверждена");
 }
 
 function switchTab(tab) {
 currentTab = tab;
-['home', 'ttk', 'actions'].forEach(t => {
-document.getElementById(`section-${t}`).classList.add('hidden');
-document.getElementById(`btn-${t}`).className = "flex flex-col items-center space-y-1 text-mutedtext opacity-60 transition";
+['home', 'ttk', 'actions'].forEach(function(t) {
+document.getElementById("section-" + t).classList.add('hidden');
+document.getElementById("btn-" + t).className = "flex flex-col items-center space-y-1 text-mutedtext opacity-60 transition";
 });
-document.getElementById(`section-${tab}`).classList.remove('hidden');
-let btnClass = "flex flex-col items-center space-y-1 text-gold scale-110 transition";
+document.getElementById("section-" + tab).classList.remove('hidden');
+var btnClass = "flex flex-col items-center space-y-1 text-gold scale-110 transition";
 if(tab === 'actions') btnClass += " relative";
-document.getElementById(`btn-${tab}`).className = btnClass;
+document.getElementById("btn-" + tab).className = btnClass;
 }
 
 function renderHome() {
 document.getElementById('userRoleText').innerText = appData.role;
-document.getElementById('userRateText').innerText = `Ставка: ${appData.rate} ₽`;
+document.getElementById('userRateText').innerText = "Ставка: " + appData.rate + " ₽";
 
-let currentDay = new Date().getDate();
-let totalShifts = 0;
-appData.schedule.forEach(s => {
+var currentDay = new Date().getDate();
+var totalShifts = 0;
+appData.schedule.forEach(function(s) {
 if(s.day <= currentDay) {
-let shiftNum = parseFloat(s.shift.toString().replace(',', '.'));
+var shiftNum = parseFloat(s.shift.toString().replace(',', '.'));
 if(!isNaN(shiftNum)) { totalShifts += shiftNum; }
 }
 });
 
-let baseEarnings = totalShifts * appData.rate;
-let totalFines = 0; let totalBonuses = 0;
-appData.fines.forEach(f => {
+var baseEarnings = totalShifts * appData.rate;
+var totalFines = 0; var totalBonuses = 0;
+appData.fines.forEach(function(f) {
 if(f.type.toLowerCase() === 'штраф') totalFines += f.volume;
 if(f.type.toLowerCase() === 'бонус') totalBonuses += f.volume;
 });
-let netEarnings = baseEarnings + totalBonuses - totalFines;
+var netEarnings = baseEarnings + totalBonuses - totalFines;
 
 document.getElementById('statsTotalShifts').innerText = totalShifts;
-document.getElementById('statsNetEarnings').innerText = `${netEarnings.toLocaleString('ru-RU')} ₽`;
+document.getElementById('statsNetEarnings').innerText = netEarnings.toLocaleString('ru-RU') + " ₽";
 
 if(appData.info && appData.info.length > 0) {
 document.getElementById('infoBlock').classList.remove('hidden');
-document.getElementById('infoTitle').innerText = `⚜️ ${appData.info[0].title}`;
+document.getElementById('infoTitle').innerText = "⚜️ " + appData.info[0].title;
 document.getElementById('infoText').innerText = appData.info[0].text;
 }
 
-let grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
-for(let d = 1; d <= 31; d++) {
-let shift = appData.schedule.find(s => s.day === d);
-let ev = appData.events ? appData.events.find(e => e.day === d) : null;
-let isWork = shift && shift.shift !== "" && shift.shift.toLowerCase() !== "о" && shift.shift.toLowerCase() !== "х";
-let isPast = d <= currentDay;
+var grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+for(var d = 1; d <= 31; d++) {
+var shift = null;
+for(var si=0; si<appData.schedule.length; si++) { if(appData.schedule[si].day === d) { shift = appData.schedule[si]; break; } }
+var ev = null;
+if(appData.events) { for(var ei=0; ei<appData.events.length; ei++) { if(appData.events[ei].day === d) { ev = appData.events[ei]; break; } } }
 
-let baseClasses = "aspect-square flex flex-col items-center justify-center rounded-lg border p-1 min-w-[40px] relative transition-all duration-300";
-let stateClasses = isWork ? (isPast ? 'bg-gold/20 text-gold border-gold' : 'bg-dark border-bordercolor text-lighttext font-bold') : 'bg-dark border-bordercolor/50 text-mutedtext';
-let eventClasses = ev ? "ring-1 ring-gold shadow-[0_0_8px_rgba(212,175,55,0.4)] cursor-pointer active:scale-95" : "";
-let clickHandler = ev ? `onclick="openCalendarEvent(${d}, \`${ev.text.replace(/`/g, "'")}\`)"` : "";
+var isWork = shift && shift.shift !== "" && shift.shift.toLowerCase() !== "о" && shift.shift.toLowerCase() !== "х";
+var isPast = d <= currentDay;
 
-let cellHtml = `<div class="${baseClasses} ${stateClasses} ${eventClasses}" ${clickHandler}>
-<span class="text-[10px] opacity-60 font-serif">${d}</span>
-<span class="text-xs font-black mt-0.5">${shift ? shift.shift : '-'}</span>`;
+var baseClasses = "aspect-square flex flex-col items-center justify-center rounded-lg border p-1 min-w-[40px] relative transition-all duration-300";
+var stateClasses = isWork ? (isPast ? 'bg-gold/20 text-gold border-gold' : 'bg-dark border-bordercolor text-lighttext font-bold') : 'bg-dark border-bordercolor/50 text-mutedtext';
+var eventClasses = ev ? "ring-1 ring-gold shadow-[0_0_8px_rgba(212,175,55,0.4)] cursor-pointer active:scale-95" : "";
+var clickHandler = ev ? "onclick=\"openCalendarEvent(" + d + ", '" + ev.text.replace(/'/g, "\\'") + "')\"" : "";
 
-if(ev) { cellHtml += `<div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-gold rounded-full border border-dark animate-pulse"></div>`; }
-cellHtml += `</div>`; grid.innerHTML += cellHtml;
+var cellHtml = "<div class='" + baseClasses + " " + stateClasses + " " + eventClasses + "' " + clickHandler + ">" +
+"<span class='text-[10px] opacity-60 font-serif'>" + d + "</span>" +
+"<span class='text-xs font-black mt-0.5'>" + (shift ? shift.shift : '-') + "</span>";
+
+if(ev) { cellHtml += "<div class='absolute -top-1 -right-1 w-2.5 h-2.5 bg-gold rounded-full border border-dark animate-pulse'></div>"; }
+cellHtml += "</div>"; grid.innerHTML += cellHtml;
 }
 
-let fList = document.getElementById('finesList'); fList.innerHTML = '';
-if(appData.fines.length === 0) { fList.innerHTML = `<p class="text-xs text-mutedtext py-2 font-serif italic">Нарушений и бонусов не обнаружено.</p>`; }
+var fList = document.getElementById('finesList'); fList.innerHTML = '';
+if(appData.fines.length === 0) { fList.innerHTML = "<p class='text-xs text-mutedtext py-2 font-serif italic'>Нарушений и бонусов не обнаружено.</p>"; }
 else {
-appData.fines.forEach(f => {
-let isBonus = f.type.toLowerCase() === 'бонус';
-fList.innerHTML += `<div class="bg-card border border-bordercolor p-3 rounded-xl flex justify-between items-center elegant-shadow"><div><p class="text-sm font-medium text-lighttext font-serif">${f.reason}</p><p class="text-[10px] text-mutedtext mt-0.5">${f.date}</p></div><span class="text-sm font-mono font-bold ${isBonus ? 'text-[#88B08A]' : 'text-[#D47070]'}">${isBonus ? '+' : '-'}${f.volume} ₽</span></div>`;
+appData.fines.forEach(function(f) {
+var isBonus = f.type.toLowerCase() === 'бонус';
+var sign = isBonus ? '+' : '-';
+var color = isBonus ? 'text-[#88B08A]' : 'text-[#D47070]';
+fList.innerHTML += "<div class='bg-card border border-bordercolor p-3 rounded-xl flex justify-between items-center elegant-shadow'><div><p class='text-sm font-medium text-lighttext font-serif'>" + f.reason + "</p><p class='text-[10px] text-mutedtext mt-0.5'>" + f.date + "</p></div><span class='text-sm font-mono font-bold " + color + "'>" + sign + f.volume + " ₽</span></div>";
 });
 }
 }
 
 function openCalendarEvent(day, text) {
-document.getElementById('eventModalDay').innerText = `${day} число`;
+document.getElementById('eventModalDay').innerText = day + " число";
 document.getElementById('eventModalText').innerText = text;
 document.getElementById('calendarEventModal').classList.remove('hidden');
 }
 function closeCalendarEvent() { document.getElementById('calendarEventModal').classList.add('hidden'); }
 
 function renderTtkCategories() {
-let bar = document.getElementById('categoriesBar');
-let cats = ['Все', ...new Set(appData.recipes.map(r => r.category))];
-bar.innerHTML = cats.map(c => `<button onclick="selectCategory('${c}')" class="px-5 py-1.5 text-xs rounded-full whitespace-nowrap border font-serif tracking-widest uppercase transition ${selectedCategory === c ? 'bg-gold text-dark border-gold font-bold' : 'bg-card border-bordercolor text-mutedtext'}">${c}</button>`).join('');
+var bar = document.getElementById('categoriesBar');
+var catArray = [];
+appData.recipes.forEach(function(r) { if(catArray.indexOf(r.category) === -1) catArray.push(r.category); });
+var cats = ['Все'].concat(catArray);
+
+var html = "";
+cats.forEach(function(c) {
+var cls = (selectedCategory === c) ? 'bg-gold text-dark border-gold font-bold' : 'bg-card border-bordercolor text-mutedtext';
+html += "<button onclick=\"selectCategory('" + c + "')\" class=\"px-5 py-1.5 text-xs rounded-full whitespace-nowrap border font-serif tracking-widest uppercase transition " + cls + "\">" + c + "</button>";
+});
+bar.innerHTML = html;
 }
 function selectCategory(cat) { selectedCategory = cat; renderTtkCategories(); filterTtk(); }
 
 function renderTtkList() {
-let container = document.getElementById('ttkList');
-let filtered = appData.recipes.filter(r => selectedCategory === 'Все' || r.category === selectedCategory);
-container.innerHTML = filtered.map(r => `<div onclick="openTtkModal('${r.name}')" class="bg-card border border-bordercolor p-4 rounded-xl flex flex-col justify-between h-28 elegant-shadow cursor-pointer active:scale-95 transition"><div><span class="text-[9px] font-bold text-goldmuted uppercase tracking-widest">${r.category}</span><h4 class="font-bold font-serif text-lg text-lighttext mt-1 leading-tight line-clamp-2">${r.name}</h4></div><p class="text-[11px] text-mutedtext font-serif italic">Выход: ${r.ingredients[0]?.output || '—'}</p></div>`).join('');
+var container = document.getElementById('ttkList');
+var filtered = [];
+appData.recipes.forEach(function(r) { if(selectedCategory === 'Все' || r.category === selectedCategory) filtered.push(r); });
+
+var html = "";
+filtered.forEach(function(r) {
+var outText = (r.ingredients && r.ingredients.length > 0 && r.ingredients[0].output) ? r.ingredients[0].output : '—';
+html += "<div onclick=\"openTtkModal('" + r.name + "')\" class=\"bg-card border border-bordercolor p-4 rounded-xl flex flex-col justify-between h-28 elegant-shadow cursor-pointer active:scale-95 transition\"><div><span class=\"text-[9px] font-bold text-goldmuted uppercase tracking-widest\">" + r.category + "</span><h4 class=\"font-bold font-serif text-lg text-lighttext mt-1 leading-tight line-clamp-2\">" + r.name + "</h4></div><p class=\"text-[11px] text-mutedtext font-serif italic\">Выход: " + outText + "</p></div>";
+});
+container.innerHTML = html;
 }
 
 function filterTtk() {
-let query = document.getElementById('searchTtk').value.toLowerCase().trim();
-let cards = document.getElementById('ttkList').children;
-appData.recipes.filter(r => selectedCategory === 'Все' || r.category === selectedCategory).forEach((r, idx) => {
-if(cards[idx]) { cards[idx].style.display = (r.name.toLowerCase().includes(query) || r.ingredients.some(i => i.name.toLowerCase().includes(query))) ? 'flex' : 'none'; }
+var query = document.getElementById('searchTtk').value.toLowerCase().trim();
+var cards = document.getElementById('ttkList').children;
+var filtered = [];
+appData.recipes.forEach(function(r) { if(selectedCategory === 'Все' || r.category === selectedCategory) filtered.push(r); });
+
+filtered.forEach(function(r, idx) {
+var match = r.name.toLowerCase().includes(query);
+if(!match) {
+for(var i=0; i<r.ingredients.length; i++) {
+if(r.ingredients[i].name.toLowerCase().includes(query)) { match = true; break; }
+}
+}
+if(cards[idx]) { cards[idx].style.display = match ? 'flex' : 'none'; }
 });
 }
 
 function openTtkModal(name) {
-let r = appData.recipes.find(rec => rec.name === name); if(!r) return; activeModalRecipe = r;
+var r = null;
+for(var i=0; i<appData.recipes.length; i++) { if(appData.recipes[i].name === name) { r = appData.recipes[i]; break; } }
+if(!r) return;
+activeModalRecipe = r;
+
 document.getElementById('modalRecipeCategory').innerText = r.category;
 document.getElementById('modalRecipeName').innerText = r.name;
-document.getElementById('modalRecipeOutput').innerText = `Выход: ${r.ingredients[0]?.output || '—'}`;
-let descBlock = document.getElementById('modalRecipeDescriptionBlock');
-let descText = document.getElementById('modalRecipeDescription');
+var outText = (r.ingredients && r.ingredients.length > 0 && r.ingredients[0].output) ? r.ingredients[0].output : '—';
+document.getElementById('modalRecipeOutput').innerText = "Выход: " + outText;
 
-// ИСПРАВЛЕНИЕ: Убрана проблема белого экрана для старых iPhone (убран оператор ?.)
-let desc = r.description ? r.description.trim() : "";
+var descBlock = document.getElementById('modalRecipeDescriptionBlock');
+var descText = document.getElementById('modalRecipeDescription');
+var desc = r.description ? r.description.trim() : "";
+
 if(desc !== "") {
 descText.innerText = desc;
-let textLen = desc.length;
+var textLen = desc.length;
 if(textLen > 250) { descText.className = "font-serif italic leading-relaxed text-mutedtext text-[11px] sm:text-xs"; }
 else if(textLen > 100) { descText.className = "font-serif italic leading-relaxed text-mutedtext text-xs sm:text-sm"; }
 else { descText.className = "font-serif italic leading-relaxed text-goldmuted text-sm sm:text-base"; }
@@ -573,19 +609,19 @@ document.getElementById('ttkModal').classList.remove('hidden');
 }
 
 function recalcTtk(mStr) {
-if(!activeModalRecipe) return; let m = parseFloat(mStr) || 0; if(m < 0) m = 0;
-document.getElementById('modalTtkBody').innerHTML = activeModalRecipe.ingredients.map(i => `
-<tr class="border-b border-bordercolor">
-<td class="py-3 font-serif text-lighttext text-sm">${i.name}</td>
-<td class="py-3 text-center text-mutedtext uppercase text-[10px] tracking-widest">${i.unit}</td>
-<td class="py-3 text-right font-mono text-gold font-bold text-sm">${(i.brutto * m).toFixed(3).replace(/\.000$/, '')}</td>
-</tr>`).join('');
+if(!activeModalRecipe) return; var m = parseFloat(mStr) || 0; if(m < 0) m = 0;
+var html = "";
+activeModalRecipe.ingredients.forEach(function(i) {
+var weight = (i.brutto * m).toFixed(3).replace(/\.000$/, '');
+html += "<tr class=\"border-b border-bordercolor\"><td class=\"py-3 font-serif text-lighttext text-sm\">" + i.name + "</td><td class=\"py-3 text-center text-mutedtext uppercase text-[10px] tracking-widest\">" + i.unit + "</td><td class=\"py-3 text-right font-mono text-gold font-bold text-sm\">" + weight + "</td></tr>";
+});
+document.getElementById('modalTtkBody').innerHTML = html;
 }
 function closeTtkModal() { document.getElementById('ttkModal').classList.add('hidden'); }
 
 function toggleIndividualInput() {
-let select = document.getElementById('actionReasonSelect');
-let input = document.getElementById('actionStaffNameInput');
+var select = document.getElementById('actionReasonSelect');
+var input = document.getElementById('actionStaffNameInput');
 if(select.value === 'Индивидуальное списание') { input.classList.remove('hidden'); } else { input.classList.add('hidden'); }
 }
 
@@ -602,7 +638,7 @@ document.getElementById('prototypeTitleInput').value = '';
 document.getElementById('prototypeOutputInput').value = '';
 document.getElementById('actionReasonSelect').value = 'Порча';
 
-let title = "Инвентаризация";
+var title = "Инвентаризация";
 if(type === 'writeoff') {
 title = "Журнал: Брак и Порча";
 document.getElementById('actionMetaRow').classList.remove('hidden');
@@ -618,8 +654,8 @@ title = "Лаборатория: Проработка";
 document.getElementById('prototypeMetaRow').classList.remove('hidden');
 }
 
-let tzOffset = (new Date()).getTimezoneOffset() * 60000;
-let localISOTime = (new Date(Date.now() - tzOffset)).toISOString().split('T')[0];
+var tzOffset = (new Date()).getTimezoneOffset() * 60000;
+var localISOTime = (new Date(Date.now() - tzOffset)).toISOString().split('T')[0];
 document.getElementById('actionDateInput').value = localISOTime;
 document.getElementById('actionDateInput').max = localISOTime;
 
@@ -627,18 +663,25 @@ document.getElementById('actionModalTitle').innerText = title; renderActionItems
 }
 
 function renderActionItems() {
-document.getElementById('actionItemsList').innerHTML = appData.items1c.map((item, idx) => `
-<div class="action-item-row p-3 mb-1 border-b border-bordercolor flex justify-between items-center gap-4 transition-all duration-300 rounded-lg" data-name="${item.name.toLowerCase()}">
-<div class="flex-1"><p class="text-sm font-medium text-lighttext font-serif">${item.name}</p><p class="text-[10px] text-mutedtext uppercase mt-0.5 tracking-widest">${item.unit}</p></div>
-<input type="number" step="0.001" placeholder="0.0" class="action-val-input w-24 bg-dark border border-bordercolor rounded-lg px-2 py-2 text-right text-gold font-mono text-sm focus:outline-none focus:border-gold transition-colors" data-idx="${idx}" oninput="filterActionItems()">
-</div>`).join('');
+var html = "";
+appData.items1c.forEach(function(item, idx) {
+var nName = item.name.toLowerCase();
+html += "<div class=\"action-item-row p-3 mb-1 border-b border-bordercolor flex justify-between items-center gap-4 transition-all duration-300 rounded-lg\" data-name=\"" + nName.replace(/"/g, "&quot;") + "\">" +
+"<div class=\"flex-1\"><p class=\"text-sm font-medium text-lighttext font-serif\">" + item.name + "</p><p class=\"text-[10px] text-mutedtext uppercase mt-0.5 tracking-widest\">" + item.unit + "</p></div>" +
+"<input type=\"number\" step=\"0.001\" placeholder=\"0.0\" class=\"action-val-input w-24 bg-dark border border-bordercolor rounded-lg px-2 py-2 text-right text-gold font-mono text-sm focus:outline-none focus:border-gold transition-colors\" data-idx=\"" + idx + "\" oninput=\"filterActionItems()\">" +
+"</div>";
+});
+document.getElementById('actionItemsList').innerHTML = html;
 }
 
 function filterActionItems() {
-let query = document.getElementById('actionSearch').value.toLowerCase().trim();
-Array.from(document.getElementById('actionItemsList').getElementsByClassName('action-item-row')).forEach(row => {
-let inputField = row.querySelector('.action-val-input');
-let val = parseFloat(inputField.value) || 0;
+var query = document.getElementById('actionSearch').value.toLowerCase().trim();
+var rows = document.getElementById('actionItemsList').getElementsByClassName('action-item-row');
+
+for(var i=0; i<rows.length; i++) {
+var row = rows[i];
+var inputField = row.querySelector('.action-val-input');
+var val = parseFloat(inputField.value) || 0;
 
 if (row.getAttribute('data-name').includes(query) || val > 0) {
 row.style.display = 'flex';
@@ -651,29 +694,29 @@ row.classList.remove('bg-gold/10', 'border-gold/30');
 row.classList.add('border-bordercolor');
 }
 } else { row.style.display = 'none'; }
-});
+}
 }
 function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
 
 function submitActionData() {
-let inputs = document.getElementById('actionItemsList').getElementsByClassName('action-val-input');
+var inputs = document.getElementById('actionItemsList').getElementsByClassName('action-val-input');
 
-let serverAction = activeActionType;
+var serverAction = activeActionType;
 if (activeActionType === 'writeoff') serverAction = 'writeOff';
 if (activeActionType === 'dinner') serverAction = 'staffDinner';
 
-let payload = { action: serverAction, userName: currentUser.name, items: [] };
+var payload = { action: serverAction, userName: currentUser.name, items: [] };
 
 if (activeActionType === 'writeoff' || activeActionType === 'dinner') {
 payload.customDate = document.getElementById('actionDateInput').value;
 }
 
 if (activeActionType === 'writeoff') {
-let reasonVal = document.getElementById('actionReasonSelect').value;
+var reasonVal = document.getElementById('actionReasonSelect').value;
 if(reasonVal === 'Индивидуальное списание') {
-let staffName = document.getElementById('actionStaffNameInput').value.trim();
+var staffName = document.getElementById('actionStaffNameInput').value.trim();
 if(!staffName) { showToast("Укажите фамилию сотрудника!", "⚠️"); vibe([50,50,50]); return; }
-reasonVal = `Индивидуальное списание (${staffName})`;
+reasonVal = "Индивидуальное списание (" + staffName + ")";
 }
 payload.reason = reasonVal;
 } else if (activeActionType === 'dinner') {
@@ -685,19 +728,19 @@ if(!payload.title) { showToast("Укажите название проработ
 if(!payload.output || parseFloat(payload.output) <= 0) { showToast("Укажите итоговый выход!", "⚠️"); vibe([50,50,50]); return; }
 }
 
-Array.from(inputs).forEach(inp => {
-let v = parseFloat(inp.value) || 0;
+for(var i=0; i<inputs.length; i++) {
+var inp = inputs[i];
+var v = parseFloat(inp.value) || 0;
 if(v > 0) {
-// ИСПРАВЛЕНИЕ: Безопасное чтение данных для старых iPhone (без ?.)
-let idx = parseInt(inp.getAttribute('data-idx'));
-let ori = appData.items1c[idx];
+var idx = parseInt(inp.getAttribute('data-idx'));
+var ori = appData.items1c[idx];
 payload.items.push({ name: ori.name, unit: ori.unit, volume: v });
 }
-});
+}
 
 if(payload.items.length === 0) { showToast("Выберите продукт!", "⚠️"); vibe([50,50,50]); return; }
 
-let msg = "Успешно отправлено";
+var msg = "Успешно отправлено";
 if (activeActionType === 'writeoff') msg = "Акт списания отправлен";
 if (activeActionType === 'dinner') msg = "Акт питания отправлен";
 if (activeActionType === 'inventory') msg = "Инвентаризация отправлена";
